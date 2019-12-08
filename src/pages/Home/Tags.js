@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: theme.spacing(2),
     marginRight: theme.spacing(3),
     padding: theme.spacing(2),
-    backgroundColor: '#F3F3F3',
+    backgroundColor: '#DEDEDE',
     display: 'flex',
     justifyContent: 'center',
     flexWrap: 'wrap',

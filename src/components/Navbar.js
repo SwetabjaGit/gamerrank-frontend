@@ -7,8 +7,10 @@ import { useDispatch } from 'react-redux';
 import { makeStyles } from '@material-ui/styles';
 import {
   AppBar,
+  Avatar,
   Badge,
   Button,
+  ButtonGroup,
   IconButton,
   Toolbar,
   Hidden,
@@ -24,9 +26,14 @@ import {
   ClickAwayListener
 } from '@material-ui/core';
 import LockIcon from '@material-ui/icons/LockOutlined';
-import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
 import InputIcon from '@material-ui/icons/Input';
 import MenuIcon from '@material-ui/icons/Menu';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
+import LockOpenIcon from '@material-ui/icons/LockOpen';
+import HomeIcon from '@material-ui/icons/Home';
+import PostAddIcon from '@material-ui/icons/PostAdd';
+import SettingsIcon from '@material-ui/icons/Settings';
+import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
 import SearchIcon from '@material-ui/icons/Search';
 
 import axios from '../utils/axios';
@@ -38,7 +45,11 @@ import NotificationsPopover from './NotificationsPopover';
 
 const useStyles = makeStyles(theme => ({
   root: {
-    boxShadow: 'none'
+    boxShadow: 'none',
+  },
+  toolbar: {
+    width: '70%',
+    margin: '0 auto'
   },
   logoIcon: {
     color: '#fff',
@@ -96,11 +107,11 @@ const useStyles = makeStyles(theme => ({
   },
   logoutIcon: {
     marginRight: theme.spacing(1)
-  }
+  },
 }));
 
 const Navbar = props => {
-  const { onOpenNavBarMobile, className, ...rest } = props;
+  const { authenticated, onOpenNavBarMobile, className, ...rest } = props;
 
   const classes = useStyles();
   const { history } = useRouter();
@@ -175,13 +186,196 @@ const Navbar = props => {
     'Pages'
   ];
 
+  const imageUrl = "https://firebasestorage.googleapis.com/v0/b/socialape-d8699.appspot.com/o/SuperbBackground.jpg?alt=media&token=cfcd0465-125d-4a98-b203-d41631da9fa4";
+
+  const searchField = (
+    <div>
+      <div
+        className={classes.search}
+        ref={searchRef}
+      >
+        <SearchIcon className={classes.searchIcon} />
+        <Input
+          className={classes.searchInput}
+          disableUnderline
+          onChange={handleSearchChange}
+          placeholder="Search people &amp; places"
+          value={searchValue}
+        />
+      </div>
+      <Popper
+        anchorEl={searchRef.current}
+        className={classes.searchPopper}
+        open={openSearchPopover}
+        transition
+      >
+        <ClickAwayListener onClickAway={handleSearchPopverClose}>
+          <Paper
+            className={classes.searchPopperContent}
+            elevation={3}
+          >
+            <List>
+              {popularSearches.map(search => (
+                <ListItem
+                  button
+                  key={search}
+                  onClick={handleSearchPopverClose}
+                >
+                  <ListItemIcon>
+                    <SearchIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={search} />
+                </ListItem>
+              ))}
+            </List>
+          </Paper>
+        </ClickAwayListener>
+      </Popper>
+    </div>
+  );
+
+  const trialExpired = (
+    <Button
+      className={classes.trialButton}
+      onClick={handlePricingOpen}
+      variant="contained"
+    >
+      <LockIcon className={classes.trialIcon} />
+      Trial expired
+    </Button>
+  );
+
+  const loggedOutButtons = (
+    <ButtonGroup
+      color="inherit"
+      aria-label="outlined button group">
+      <Button>Home</Button>
+      <Button>Sign In</Button>
+      <Button>Sign Up</Button>
+    </ButtonGroup>
+  );
+
+  const loggedInButtons = (
+    <ButtonGroup
+      color="inherit"
+      aria-label="outlined button group">
+      <Button>Home</Button>
+      <Button>New Article</Button>
+      <Button>Settings</Button>
+    </ButtonGroup>
+  );
+
+  const signupIcon = (
+    <IconButton
+      key="signupIcon"
+      className={classes.notificationsButton}
+      color="inherit"
+    >
+      <PersonAddIcon />
+    </IconButton>
+  );
+
+  const loginIcon = (
+    <IconButton
+      key="loginIcon"
+      className={classes.notificationsButton}
+      color="inherit"
+    >
+      <LockOpenIcon />
+    </IconButton>
+  );
+
+  const homeIcon = (
+    <IconButton
+      key="homeIcon"
+      className={classes.notificationsButton}
+      color="inherit"
+    >
+      <HomeIcon />
+    </IconButton>
+  );
+
+  const newScreamIcon = (
+    <IconButton
+      key="newScreamIcon"
+      className={classes.notificationsButton}
+      color="inherit"
+    >
+      <PostAddIcon />
+    </IconButton>
+  );
+
+  const settingsIcon = (
+    <IconButton
+      key="settingsIcon"
+      className={classes.notificationsButton}
+      color="inherit"
+    >
+      <SettingsIcon />
+    </IconButton>
+  );
+
+  const notifictionIcon = (
+    <IconButton
+      key="notifictionIcon"
+      className={classes.notificationsButton}
+      color="inherit"
+      onClick={handleNotificationsOpen}
+      ref={notificationsRef}
+    >
+      <Badge
+        badgeContent={notifications.length}
+        classes={{ badge: classes.notificationsBadge }}
+      >
+        <NotificationsIcon />
+      </Badge>
+    </IconButton>
+  );
+
+  const userProfile = (
+    <Button
+      key="userProfile"
+      className={classes.logoutButton}
+      color="inherit"
+    >
+      <Avatar alt="Swetabja Hazra" src={imageUrl} className={classes.logoutIcon} />
+      Swetabja Hazra
+    </Button>
+  );
+
+  const signoutButton = (
+    <Button
+      key="signoutButton"
+      className={classes.logoutButton}
+      color="inherit"
+      onClick={handleLogout}
+    >
+      <InputIcon className={classes.logoutIcon} />
+      Sign out
+    </Button>
+  );
+
+  const loggedOutIconTray = ([
+    homeIcon,
+    signupIcon,
+    loginIcon
+  ]);
+
+  const loggedInIconTray = ([
+    homeIcon,
+    newScreamIcon,
+    settingsIcon,
+    notifictionIcon,
+    userProfile
+  ]);
+
   return (
     <AppBar
       {...rest}
       className={clsx(classes.root, className)}
       color="primary"
     >
-      <Toolbar>
+      <Toolbar className={classes.toolbar}>
         <div>
           <Typography
             className={classes.logoIcon}
@@ -192,88 +386,11 @@ const Navbar = props => {
           </Typography>
         </div>
         <div className={classes.flexGrow} />
-        <Hidden smDown>
-          <div
-            className={classes.search}
-            ref={searchRef}
-          >
-            <SearchIcon className={classes.searchIcon} />
-            <Input
-              className={classes.searchInput}
-              disableUnderline
-              onChange={handleSearchChange}
-              placeholder="Search people &amp; places"
-              value={searchValue}
-            />
-          </div>
-          <Popper
-            anchorEl={searchRef.current}
-            className={classes.searchPopper}
-            open={openSearchPopover}
-            transition
-          >
-            <ClickAwayListener onClickAway={handleSearchPopverClose}>
-              <Paper
-                className={classes.searchPopperContent}
-                elevation={3}
-              >
-                <List>
-                  {popularSearches.map(search => (
-                    <ListItem
-                      button
-                      key={search}
-                      onClick={handleSearchPopverClose}
-                    >
-                      <ListItemIcon>
-                        <SearchIcon />
-                      </ListItemIcon>
-                      <ListItemText primary={search} />
-                    </ListItem>
-                  ))}
-                </List>
-              </Paper>
-            </ClickAwayListener>
-          </Popper>
-          <Button
-            className={classes.trialButton}
-            onClick={handlePricingOpen}
-            variant="contained"
-          >
-            <LockIcon className={classes.trialIcon} />
-            Trial expired
-          </Button>
-        </Hidden>
         <Hidden mdDown>
-          <IconButton
-            className={classes.notificationsButton}
-            color="inherit"
-            onClick={handleNotificationsOpen}
-            ref={notificationsRef}
-          >
-            <Badge
-              badgeContent={notifications.length}
-              classes={{ badge: classes.notificationsBadge }}
-              variant="dot"
-            >
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-          <Button
-            className={classes.logoutButton}
-            color="inherit"
-            onClick={handleLogout}
-          >
-            <InputIcon className={classes.logoutIcon} />
-            Sign out
-          </Button>
+          {authenticated === true ? loggedInIconTray : loggedOutIconTray}
         </Hidden>
         <Hidden lgUp>
-          <IconButton
-            color="inherit"
-            onClick={onOpenNavBarMobile}
-          >
-            <MenuIcon />
-          </IconButton>
+          {authenticated === true ? loggedInIconTray : loggedOutIconTray}
         </Hidden>
       </Toolbar>
       <PricingModal

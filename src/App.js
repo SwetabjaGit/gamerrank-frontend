@@ -8,7 +8,6 @@ import axios from 'axios';
 
 // Components
 import theme from './theme';
-import LoggedOutNavbar from './components/LoggedOutNavbar';
 import Navbar from './components/Navbar';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
@@ -49,8 +48,6 @@ axios.defaults.baseURL = 'https://us-central1-socialape-d8699.cloudfunctions.net
 const App = () => {
 
   const classes = useStyles();
-  const RenderNavbar = authenticated === true ? <Navbar /> : <LoggedOutNavbar />
-
   const renderHome = () => {
     return (
       <Home
@@ -64,7 +61,7 @@ const App = () => {
     <ThemeProvider theme={theme}>
       <div className={classes.root}>
         <Router history={history}>
-          { RenderNavbar }
+          <Navbar authenticated={authenticated} />
           <div>
             <Switch>
               <Route exact path="/:tab" component={renderHome} />

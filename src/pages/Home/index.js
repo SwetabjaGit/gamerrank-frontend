@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
     margin: '0 auto',
-    marginTop: 57,
+    marginTop: 64,
     backgroundColor: '#F4F6F8'
   },
   feed: {
