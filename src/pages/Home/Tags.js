@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: theme.spacing(2),
     marginRight: theme.spacing(3),
     padding: theme.spacing(2),
-    backgroundColor: '#F3F3F3',
+    backgroundColor: '#DEDEDE',
     display: 'flex',
     justifyContent: 'center',
     flexWrap: 'wrap',
@@ -30,8 +30,8 @@ const Tags = () => {
   const [tags, setTags] = useState(null);
   const classes = useStyles();
 
-  const fetchTags = () => {
-    axios.get('http://conduit.productionready.io/api/tags')
+  const fetchTags = async (source) => {
+    await axios.get('http://conduit.productionready.io/api/tags', { cancelToken: source.token })
       .then(res => {
         console.log(res.data.tags);
         setTags(res.data.tags);
@@ -42,7 +42,14 @@ const Tags = () => {
   };
 
   useEffect(() => {
-    fetchTags();
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
+
+    fetchTags(source);
+
+    return () => {
+      source.cancel();
+    };
   }, []);
 
   const createTag = str => {

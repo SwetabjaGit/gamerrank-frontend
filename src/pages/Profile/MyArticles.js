@@ -7,7 +7,6 @@ import { makeStyles } from '@material-ui/styles';
 //Components
 import ScreamSkeleton from '../../utils/ScreamSkeleton';
 
-
 const useStyles = makeStyles(() => ({
   paginateBox: {
     width: '100%',
@@ -16,14 +15,15 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const GlobalFeed = () => {
+const MyArticles = (props) => {
   
+  const { screams } = props;
   const classes = useStyles();
-  const [screams, setScreams] = useState(null);
+  //const [screams, setScreams] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 4;
   
-  const fetchScreams = async (source) => {
+  /* const fetchScreams = async (source) => {
     await axios.get('/screams', { cancelToken: source.token })
       .then(res => {
         console.log(res.data);
@@ -36,13 +36,13 @@ const GlobalFeed = () => {
           console.error(err);
         }
       });
-  };
+  }; */
 
   useEffect(() => {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
 
-    fetchScreams(source);
+    //fetchScreams(source);
 
     return () => {
       source.cancel();
@@ -53,7 +53,7 @@ const GlobalFeed = () => {
     screams.map(scream => <ArticleItem key={scream.screamId} scream={scream}></ArticleItem>)
   ) : (
     <ScreamSkeleton />
-  )
+  );
 
   let pagesCount = screamsList.length > 0 ? Math.ceil(screamsList.length / itemsPerPage) : 6;
 
@@ -77,4 +77,4 @@ const GlobalFeed = () => {
 
 
 
-export default GlobalFeed;
+export default MyArticles;

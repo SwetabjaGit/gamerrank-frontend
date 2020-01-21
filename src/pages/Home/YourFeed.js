@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import axios from 'axios';
-import ArticleItem from '../../components/ArticleItem';
+//import ArticleItem from '../../components/ArticleItem';
 
 
 const YourFeed = () => {
 
-  const [notifications, setNotifications] = useState(null);
+  //const [notifications, setNotifications] = useState(null);
 
   const fetchNotifications = () => {
     axios.get('/notifications')
       .then(res => {
         console.log(res.data);
-        setNotifications(res.data);
+        //setNotifications(res.data);
       })
       .catch(err => {
         console.error(err);

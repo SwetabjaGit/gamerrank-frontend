@@ -1,139 +1,142 @@
-import React, { Component } from 'react';
-import withStyles from '@material-ui/core/styles/withStyles';
+import React, { useState } from 'react';
+import { makeStyles } from '@material-ui/styles';
 import PropTypes from 'prop-types';
 import AppIcon from '../images/icon.png';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import clsx from 'clsx';
 
 //MUI Stuff
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import TextField from '@material-ui/core/TextField';
-import { Button } from '@material-ui/core';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import theme from '../utils/AuthTheme';
+import {
+  Button,
+  Typography,
+  TextField,
+  CircularProgress,
+  Card,
+  CardContent,
+  CardActions,
+  Divider,
+} from '@material-ui/core';
+import AuthTheme from '../utils/AuthTheme';
 
 
-const styles = theme.AuthTheme;
+const useStyles = makeStyles(AuthTheme);
 
-class Login extends Component {
+const Login = (props) => {
+  const { history, className } = props;
+  const classes = useStyles();
 
-    constructor() {
-        super();
-        this.state = {
-            email: '',
-            password: '',
-            loading: false,
-            errors: {}
-        };
-    }
+  const INITIAL_USER_STATE = { email: '', password: '' };
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [userData, setuserData] = useState(INITIAL_USER_STATE);
 
-    handleSubmit = (event) => {
-        event.preventDefault();
-        this.setState({
-            loading: true
-        });
-        const userData = {
-            email: this.state.email,
-            password: this.state.password
-        };
-        axios.post('/login', userData)
-            .then(res => {
-                console.log(res.data);
-                //Store the token in LocalStorage so that we can use it later
-                localStorage.setItem('FBIdToken', `Bearer ${res.data.token}`);
-                this.setState({
-                    loading: false
-                });
-                this.props.history.push('/')
-            })
-            .catch(err => {
-                console.log(err);
-                this.setState({
-                    errors: err.response.data,
-                    loading: false
-                });
-            });
-    };
+  const postUserData = (newData) => {
+    axios.post('/login', newData)
+      .then(res => {
+         console.log(res.data);  //Store the token in LocalStorage so that we can use it later
+         localStorage.setItem('FBIdToken', `Bearer ${res.data.token}`);
+         setLoading(false);
+         history.push('/');
+      })
+      .catch(err => {
+        console.log(err);
+        setErrors(err.response.data);
+        setLoading(false);
+      });
+  };
 
-    handleChange = (event) => {
-        this.setState({
-            [event.target.name]: event.target.value
-        });
-    };
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    setLoading(true);
+    setuserData({
+      email: userData.email,
+      password: userData.password
+    });
+    console.log(userData);
+    postUserData(userData);
+  };
 
-    render() {
-        const { classes } = this.props;
-        const { errors, loading } = this.state;
+  const handleChange = (event) => {
+    setuserData({
+      ...userData,
+      [event.target.name]: event.target.value
+    });
+    console.log(userData);
+  };
 
-        return (
-            <Grid container className={ classes.form }>
-                <Grid item sm />
-                <Grid item sm >
-                    <img src={AppIcon} alt="monkey" className={classes.image} />
-                    <Typography variant="h2" className={classes.pageTitle}>
-                        Login
-                    </Typography>
-                    <form noValidate onSubmit={ this.handleSubmit }>
-                        <TextField
-                            id="email"
-                            name="email"
-                            type="email"
-                            label="Email"
-                            autoComplete="email"
-                            margin="normal"
-                            className={classes.textField}
-                            helperText={errors.email}
-                            error={errors.email ? true : false}
-                            value={this.state.email}
-                            onChange={this.handleChange}
-                            fullWidth
-                        />
-                        <TextField
-                            id="password"
-                            name="password"
-                            type="password"
-                            label="Password"
-                            autoComplete="current-password"
-                            margin="normal"
-                            className={classes.textField}
-                            helperText={errors.password}
-                            error={errors.password ? true : false}
-                            value={this.state.password}
-                            onChange={this.handleChange}
-                            fullWidth
-                        />
-                        {errors.general && (
-                            <Typography variant="body2" className={classes.customError}>
-                                {errors.general}
-                            </Typography>
-                        )}
-                        <Button
-                            id="sbchjds"
-                            type="submit"
-                            variant="contained"
-                            color="primary"
-                            className={classes.button}
-                        >
-                            Login
-                        </Button>
-                        <br />
-                        <small >
-                            Dont have and account ? Signup 
-                            <Link to="/signup"> here</Link>
-                        </small>
-                        <br />
-                        { loading ? <CircularProgress className={classes.progress} color="secondary" /> : <span></span> }
-                    </form>
-                </Grid>
-                <Grid item sm></Grid>
-            </Grid>
-        );
-    }
-}
+  return (
+    <Card
+      className={clsx(classes.root, className)}
+    >
+      <form noValidate onSubmit={ handleSubmit }>
+        <Typography variant="h2" className={classes.pageTitle}>
+          Login
+        </Typography>
+        <Divider />
+        <CardContent className={classes.cardContent}>
+          <img src={AppIcon} alt="monkey" className={classes.image} />
+          <TextField
+            id="email"
+            name="email"
+            type="email"
+            label="Email"
+            autoComplete="email"
+            margin="normal"
+            className={classes.textField}
+            helperText={errors.email}
+            error={errors.email ? true : false}
+            value={userData.email}
+            onChange={handleChange}
+            variant="outlined"
+          />
+          <TextField
+            id="password"
+            name="password"
+            type="password"
+            label="Password"
+            autoComplete="current-password"
+            margin="normal"
+            className={classes.textField}
+            helperText={errors.password}
+            error={errors.password ? true : false}
+            value={userData.password}
+            onChange={handleChange}
+            variant="outlined"
+          />
+          {errors.general && (
+            <Typography variant="body2" className={classes.customError}>
+              {errors.general}
+            </Typography>
+          )}
+          <br />
+        </CardContent>
+        <Divider />
+        <CardActions className={classes.cardActions}>
+          <Button
+            id="submit-login"
+            type="submit"
+            className={classes.saveButton}
+            variant="contained"
+            size="large"
+          >
+            Login
+          </Button>
+          <small >
+            Dont have and account ? Signup 
+            <Link to="/signup"> here</Link>
+          </small>
+          <br />
+          { loading ? <CircularProgress className={classes.progress} color="secondary" /> : <span></span> }
+        </CardActions>
+      </form>
+    </Card>
+  )
+};
 
 Login.propTypes = {
-    classes: PropTypes.object.isRequired
-}
+  history: PropTypes.object,
+  className: PropTypes.string
+};
 
-export default withStyles(styles)(Login);
+export default Login;

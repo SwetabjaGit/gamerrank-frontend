@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardMedia from '@material-ui/core/CardMedia';
+import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import Collapse from '@material-ui/core/Collapse';
@@ -18,6 +19,10 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { Link } from 'react-router-dom';
+
+// Components
+//import Article from '../pages/Article/index';
 
 
 const useStyles = makeStyles(theme => ({
@@ -30,6 +35,10 @@ const useStyles = makeStyles(theme => ({
   media: {
     minWidth: 200,
     height: 200
+  },
+  actionArea: {
+    maxWidth: 200,
+    maxHeight: 200
   },
   content: {
     display: 'flex',
@@ -77,18 +86,35 @@ const ArticleItem = props => {
     setExpanded(!expanded);
   };
 
+  /* const handleArticleOpen = () => {
+    console.log('Article is Opening.');
+    return (
+      <Article key={scream.screamId} screamId={scream.screamId} />
+    );
+  }; */
+
   return (
     <Card className={classes.card}>
-      <CardMedia
-        className={classes.media}
-        image={scream.userImage}
-        title="Paella dish"
-      />
+      <Link 
+        to={`/article/${scream.screamId}`}
+      >
+        <CardActionArea 
+          className={classes.actionArea}
+        >
+          <CardMedia
+            className={classes.media}
+            image={scream.userImage}
+            title="Paella dish"
+          />
+        </CardActionArea>
+      </Link>
       <div className={classes.content}>
         <CardHeader
           className={classes.cardHeader}
           avatar={
-            <Avatar aria-label="recipe" className={classes.avatar} src={scream.userImage} />
+            <Link to={`/profile/${scream.userHandle}/myarticles`} >
+              <Avatar aria-label="recipe" className={classes.avatar} src={scream.userImage} />
+            </Link>
           }
           action={
             <IconButton aria-label="settings">

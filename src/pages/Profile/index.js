@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import { 
   Tabs, 
@@ -9,13 +9,12 @@ import {
 import { withRouter, Redirect } from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 
 // Components
-import Header from '../../components/Header';
-import GlobalFeed from './GlobalFeed';
-import YourFeed from './YourFeed';
-import TagFilter from './TagFilter';
-import Tags from './Tags';
+import Header from './Header';
+import MyArticles from './MyArticles';
+import FavoritedArticles from './FavoritedArticles';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -24,8 +23,12 @@ const useStyles = makeStyles((theme) => ({
     margin: '0 auto',
     backgroundColor: '#F4F6F8'
   },
+  box: {
+    marginLeft: 100,
+    marginRight: 100
+  },
   feed: {
-    margin: '0 auto',
+    margin: 'auto',
     width: theme.breakpoints.values.lg
   },
   tabs: {
@@ -37,47 +40,45 @@ const useStyles = makeStyles((theme) => ({
   content: {
     marginTop: theme.spacing(3)
   },
-  tagHeading: {
-    width: '100%',
-    margin: theme.spacing(3)
-  },
-  tagBox: {
-    marginTop: theme.spacing(5),
-    marginLeft: theme.spacing(2),
-    marginRight: theme.spacing(3),
-    padding: theme.spacing(2),
-    backgroundColor: '#F3F3F3',
-    display: 'flex',
-    justifyContent: 'center',
-    flexWrap: 'wrap',
-    '& > *': {
-      margin: theme.spacing(0.5),
-    },
-  },
 }));
 
-const Home = (props) => {
 
-  const { match, history, location, authenticated } = props;
+const Profile = (props) => {
+
+  const { match, history, location } = props;
   const classes = useStyles();
-  const { tab } = match.params;
+  const { userHandle, tab } = match.params;
+  const [user, setUser] = useState(null);
+  const [screams, setScreams] = useState(null);
 
   const handleTabsChange = (event, value) => {
     history.push(value);
   };
 
-  const tabs = [];
+  useEffect(() => {
 
-  if(authenticated === true){
-    tabs.push({ value: 'yourfeed', label: 'Your Feed' });
-    tabs.push({ value: 'globalfeed', label: 'Global Feed' });
-    tabs.push({ value: 'tagfilter', label: 'Tag Filter' });
-  } else {
-    tabs.push({ value: 'globalfeed', label: 'Global Feed' });
-  }
+    const fetchUserDetails = () => {
+      axios.get(`/user/${userHandle}`)
+        .then(res => {
+          console.log('UserDetails', res.data);
+          setUser(res.data.user);
+          setScreams(res.data.screams);
+        })
+        .catch(err => {
+          console.error(err);
+        })
+    };
+
+    fetchUserDetails();
+
+  }, [userHandle]);
+
+  const tabs = [];
+  tabs.push({ value: 'myarticles', label: 'My Articles' });
+  tabs.push({ value: 'favorited', label: 'Favorited Articles' });
 
   if(!tab){
-    return <Redirect to='/globalfeed' />;
+    return <Redirect to='/myarticles' />;
   }
   if(!tabs.find(t => t.value === tab)) {
     return <Redirect to="/" />;
@@ -85,12 +86,14 @@ const Home = (props) => {
 
   return (
     <div className={classes.root}>
-      <Header
-        title="CONDUIT"
-        description="A place to share your knowledge"
-      />
+      {user && <Header user={user} />}
       <Grid className={classes.feed} container spacing={1}>
-        <Grid item sm={9} xs={12}>
+        <Grid
+          item 
+          sm={12} 
+          xs={12}
+          className={classes.box}
+        >
           <Tabs
             className={classes.tabs}
             onChange={handleTabsChange}
@@ -109,26 +112,25 @@ const Home = (props) => {
           <Divider className={classes.divider} />
           <div className={classes.content}>
             {console.log(location.pathname)}
-            {tab === 'yourfeed' && <YourFeed />}
-            {tab === 'globalfeed' && <GlobalFeed />}
-            {tab === 'tagfilter' && <TagFilter />}
+            {tab === 'myarticles' && <MyArticles screams={screams} />}
+            {tab === 'favorited' && <FavoritedArticles screams={screams} />}
           </div>
         </Grid>
-        <Grid item sm={3} xs={12}>
-          <Tags />
-        </Grid>
+        {/* <Grid item sm={3} xs={12}>
+        </Grid> */}
       </Grid>
     </div>
   );
+
 };
 
-Home.propTypes = {
+
+
+Profile.propTypes = {
   match: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
-  location: PropTypes.object.isRequired,
-  authenticated: PropTypes.bool.isRequired
+  location: PropTypes.object.isRequired
 };
 
-export default withRouter(Home);
-
+export default withRouter(Profile);
 

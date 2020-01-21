@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 
 const Paginate = props => {
 
-  const { itemsPerPage, pagesCount, currentPage, setCurrentPage } = props;
+  const { pagesCount, currentPage, setCurrentPage } = props;
 
   const handleClick = (e, index) => {
     e.preventDefault();
@@ -57,7 +57,6 @@ const Paginate = props => {
 };
 
 Paginate.propTypes = {
-  itemsPerPage: PropTypes.number.isRequired,
   pagesCount: PropTypes.number.isRequired,
   currentPage: PropTypes.number.isRequired,
   setCurrentPage: PropTypes.func.isRequired

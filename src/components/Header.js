@@ -3,12 +3,10 @@ import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/styles';
 import {
-  Button,
   colors,
   Typography
 } from '@material-ui/core';
-import AddPhotoIcon from '@material-ui/icons/AddPhotoAlternate';
-import HeaderImage from '../images/beast-cover.jpg';
+//import HeaderImage from '../images/beast-cover.jpg';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -55,17 +53,17 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Header = props => {
-  const { className, ...rest } = props;
+  const { className, title, description, ...rest } = props;
 
   const classes = useStyles();
 
-  const user = {
+  /* const user = {
     name: 'Shen Zhi',
     bio: 'Web Developer',
     avatar: HeaderImage,
     cover: HeaderImage,
     connectedStatus: 'not_connected'
-  };
+  }; */
 
   return (
     <div
@@ -80,13 +78,13 @@ const Header = props => {
           className={classes.bannerText1}
           variant="h1"
         >
-          CONDUIT
+          {title}
         </Typography>
         <Typography
           className={classes.bannerText2}
           variant="h3"
         >
-          A place to share your knowledge
+          {description}
         </Typography>
       </div>
     </div>
