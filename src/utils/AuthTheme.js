@@ -5,13 +5,13 @@ const AuthTheme = (theme) => ({
     width: theme.breakpoints.values.sm,
     margin: '0 auto',
     marginTop: 40,
+    marginBottom: 20,
     textAlign: 'center'
   },
   cardContent: {
     display: 'flex',
     flexDirection: 'column',
-    padding: 20,
-    paddingTop: 0
+    padding: 20
   },
   textFields: {
     margin: 10

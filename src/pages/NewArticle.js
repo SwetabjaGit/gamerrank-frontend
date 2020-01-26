@@ -73,7 +73,7 @@ const useStyles = makeStyles((theme) => ({
 
 const NewArticle = props => {
 
-  const { className, ...rest } = props;
+  const { className, staticContext, ...rest } = props;
   const classes = useStyles();
 
   const [inputValue, setInputValue] = useState('');

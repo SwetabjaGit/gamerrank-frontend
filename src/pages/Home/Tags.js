@@ -31,9 +31,8 @@ const Tags = () => {
   const classes = useStyles();
 
   const fetchTags = async (source) => {
-    await axios.get('http://conduit.productionready.io/api/tags', { cancelToken: source.token })
+    await axios.get('/tags', { cancelToken: source.token })
       .then(res => {
-        console.log(res.data.tags);
         setTags(res.data.tags);
       })
       .catch(err => {
@@ -69,7 +68,7 @@ const Tags = () => {
           color: '#fff'
         }}
       />)
-  ) : <p>Loading...</p>
+  ) : <p>Loading...</p>;
 
   return (
     <div className={classes.tagBox}>

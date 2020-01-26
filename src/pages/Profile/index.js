@@ -13,6 +13,7 @@ import axios from 'axios';
 
 // Components
 import Header from './Header';
+import HeaderSkeleton from '../../utils/HeaderSkeleton';
 import MyArticles from './MyArticles';
 import FavoritedArticles from './FavoritedArticles';
 
@@ -66,7 +67,7 @@ const Profile = (props) => {
         })
         .catch(err => {
           console.error(err);
-        })
+        });
     };
 
     fetchUserDetails();
@@ -86,7 +87,11 @@ const Profile = (props) => {
 
   return (
     <div className={classes.root}>
-      {user && <Header user={user} />}
+      { user === null ? (
+          <HeaderSkeleton />
+        ) : (
+          <Header user={user} />
+      )}
       <Grid className={classes.feed} container spacing={1}>
         <Grid
           item 
@@ -116,12 +121,11 @@ const Profile = (props) => {
             {tab === 'favorited' && <FavoritedArticles screams={screams} />}
           </div>
         </Grid>
-        {/* <Grid item sm={3} xs={12}>
-        </Grid> */}
+        <Grid item sm={3} xs={12}>
+        </Grid>
       </Grid>
     </div>
   );
-
 };
 
 

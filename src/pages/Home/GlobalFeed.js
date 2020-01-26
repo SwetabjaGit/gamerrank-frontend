@@ -30,11 +30,7 @@ const GlobalFeed = () => {
         setScreams(res.data)
       })
       .catch(err => {
-        if(axios.isCancel(err)) {
-          console.log("cancelled");
-        } else {
-          console.error(err);
-        }
+        console.error(err);
       });
   };
 

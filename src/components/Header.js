@@ -72,7 +72,7 @@ const Header = props => {
     >
       <div
         className={classes.cover}
-        style={{ backgroundColor: '#5CB85C' }}
+        style={{ backgroundColor: '#388E3C' }}
       >
         <Typography
           className={classes.bannerText1}

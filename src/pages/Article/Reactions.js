@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/styles';
@@ -20,6 +20,7 @@ const useStyles = makeStyles(theme => ({
   },
   likeButton: {},
   likedButton: {
+    border: '#fff',
     color: colors.red[600]
   },
   shareButton: {
@@ -36,7 +37,11 @@ const Reactions = props => {
   const classes = useStyles();
 
   const [liked, setLiked] = useState(false);
-  const [likes, setLikes] = useState(likeCount);
+  const [likes, setLikes] = useState(0);
+
+  useEffect(() => {
+    setLikes(likeCount);
+  }, [likeCount]);
 
   const handleLike = () => {
     setLiked(true);

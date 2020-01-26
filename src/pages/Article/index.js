@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
   },
   posts: {
     width: '60%',
-    minHeight: 1000,
+    minHeight: 780,
     margin: '0 auto',
     marginTop: theme.spacing(2)
   },
