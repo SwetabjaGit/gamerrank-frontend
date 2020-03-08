@@ -13,6 +13,7 @@ import Navbar from './components/Navbar';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
 import Home from './pages/Home';
+import Tracks from './pages/Tracks';
 import NewArticle from './pages/NewArticle';
 import Profile from './pages/Profile';
 import Article from './pages/Article/index';
@@ -98,6 +99,7 @@ const App = () => {
           <div className={classes.mainContent}>
             <Switch>
               <Route exact path="/" component={renderHome} />
+              <Route exact path="/tracks" component={Tracks} />
               <Route exact path="/login" component={Login} />
               <Route exact path="/signup" component={Signup} />
               <Route exact path="/settings" component={Settings} />

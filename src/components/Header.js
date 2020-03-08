@@ -31,7 +31,7 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     margin: 'auto',
     position: 'relative',
-    height: 200,
+    height: 280,
     '&:hover': {
       '& $changeButton': {
         visibility: 'visible'

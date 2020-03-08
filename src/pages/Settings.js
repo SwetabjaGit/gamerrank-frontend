@@ -16,7 +16,8 @@ const useStyles = makeStyles((theme) => ({
   root: {
     width: theme.breakpoints.values.md,
     margin: '0 auto',
-    marginTop: 30,
+    marginTop: 40,
+    marginBottom: 20,
     textAlign: 'center'
   },
   cardContent: {

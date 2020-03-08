@@ -17,6 +17,8 @@ import {
   Typography,
   Tooltip,
 } from '@material-ui/core';
+
+//Icons
 import MenuIcon from '@material-ui/icons/Menu';
 import InputIcon from '@material-ui/icons/Input';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
@@ -26,10 +28,10 @@ import HomeIcon from '@material-ui/icons/Home';
 import PostAddIcon from '@material-ui/icons/PostAdd';
 import SettingsIcon from '@material-ui/icons/Settings';
 import NotificationsIcon from '@material-ui/icons/Notifications';
+import TrackChangesIcon from '@material-ui/icons/TrackChanges';
 
 
 import axios from '../utils/axios';
-import axiosn from 'axios';
 import useRouter from '../utils/useRouter';
 import PricingModal from './PricingModal';
 import NotificationsPopover from './NotificationsPopover';
@@ -126,6 +128,12 @@ const Navbar = (props) => {
     </NavbarButton>
   );
 
+  const tracksIcon = (
+    <NavbarButton key="Tracks" tip="Tracks" link="/tracks" btnClassName={classes.notificationsButton}>
+      <TrackChangesIcon />
+    </NavbarButton>
+  );
+
   const homeIcon = (
     <NavbarButton key="Home" tip="Home" link="/" btnClassName={classes.notificationsButton}>
       <HomeIcon />
@@ -191,12 +199,14 @@ const Navbar = (props) => {
 
   const loggedOutIconTray = ([
     homeIcon,
+    tracksIcon,
     signupIcon,
     loginIcon
   ]);
 
   const loggedInIconTray = ([
     homeIcon,
+    tracksIcon,
     newArticleIcon,
     settingsIcon,
     notifictionIcon,

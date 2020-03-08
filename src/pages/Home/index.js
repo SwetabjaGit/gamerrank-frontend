@@ -58,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Home = (props) => {
 
-  const { match, history, location, authenticated } = props;
+  const { match, history, authenticated } = props;
   const classes = useStyles();
   const { tab } = match.params;
 
@@ -108,7 +108,7 @@ const Home = (props) => {
           </Tabs>
           <Divider className={classes.divider} />
           <div className={classes.content}>
-            {console.log(location.pathname)}
+            {/* {console.log(location.pathname)} */}
             {tab === 'yourfeed' && <YourFeed />}
             {tab === 'globalfeed' && <GlobalFeed />}
             {tab === 'tagfilter' && <TagFilter />}
