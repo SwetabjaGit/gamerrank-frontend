@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import PropTypes from 'prop-types';
 import AppIcon from '../images/icon.png';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import clsx from 'clsx';
 
 //MUI Stuff
@@ -19,37 +18,33 @@ import {
 } from '@material-ui/core';
 import AuthTheme from '../utils/AuthTheme';
 
+// Redux Stuff
+import { connect } from 'react-redux';
+import { signupUser } from '../redux/actions/userActions';
+
+
 
 const useStyles = makeStyles(AuthTheme);
 
-const Login = (props) => {
-  const { history, className } = props;
+const Signup = (props) => {
+  
+  const { history, className, UI: { loading } } = props;
   const classes = useStyles();
 
   const INITIAL_USER_STATE = { email: '', password: '', confirmPassword: '', handle: '' };
   const [newUserData, setnewUserData] = useState(INITIAL_USER_STATE);
-  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   
 
-  const createNewUser = (newData) => {
-    axios.post('/signup', newData)
-      .then(res => {
-         console.log(res.data);  //Store the token in browser localstorage so that we can use it later
-         localStorage.setItem('FBIdToken', `Bearer ${res.data.token}`);
-         setLoading(false);
-         history.push('/');
-      })
-      .catch(err => {
-        console.log(err);
-        setErrors(err.response.data);
-        setLoading(false);
-      });
-  };
+
+  useEffect(() => {
+    if(props.UI.errors){
+      setErrors(props.UI.errors)
+    }
+  }, [props.UI.errors]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setLoading(true);
     setnewUserData({
       email: newUserData.email,
       password: newUserData.password,
@@ -57,7 +52,7 @@ const Login = (props) => {
       handle: newUserData.handle
     });
     console.log(newUserData);
-    createNewUser(newUserData);
+    props.signupUser(newUserData, history);
   };
 
   const handleChange = (event) => {
@@ -151,7 +146,7 @@ const Login = (props) => {
             variant="contained"
             size="large"
           >
-            SignUp
+            Signup
           </Button>
           <small >
             Already have an account ? Login
@@ -165,9 +160,21 @@ const Login = (props) => {
   )
 };
 
-Login.propTypes = {
+Signup.propTypes = {
   history: PropTypes.object,
   className: PropTypes.string
 };
 
-export default Login;
+const mapStateToProps = (state) => ({
+  user: state.user,
+  UI: state.UI
+});
+
+const mapActionsToProps = {
+  signupUser,
+};
+
+export default connect(
+  mapStateToProps,
+  mapActionsToProps
+)(Signup);

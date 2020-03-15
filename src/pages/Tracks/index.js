@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/styles';
@@ -20,15 +20,17 @@ import {
 import { ToggleButtonGroup, ToggleButton } from '@material-ui/lab';
 import ViewModuleIcon from '@material-ui/icons/ViewModule';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import axios from 'axios';
 import InfiniteScroll from 'react-infinite-scroller';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import SearchIcon from '@material-ui/icons/Search';
 
 // Components
-//import { Paginate } from 'components';
 import GridCard from './GridCard';
 import Header from '../../components/Header';
+
+// Redux Stuff
+import { connect } from 'react-redux';
+import { fetchTracks, clearTracks } from '../../redux/actions/dataActions';
 
 
 
@@ -122,7 +124,11 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Tracks = props => {
-  const { className, staticContext, ...rest } = props;
+  const { 
+    className, staticContext,
+    tracks, nextHref, hasMoreItems,
+    fetchTracks, clearTracks, ...rest
+  } = props;
 
   const classes = useStyles();
   const sortRef = useRef(null);
@@ -132,9 +138,9 @@ const Tracks = props => {
   const [openSort, setOpenSort] = useState(false);
   const [selectedSort, setSelectedSort] = useState('Most popular');
   const [mode, setMode] = useState('grid');
-  const [tracks, setTracks] = useState([]);
-  const [hasMoreItems, setHasMoreItems] = useState(true);
-  const [nextHref, setNextHref] = useState(null);
+  //const [tracks, setTracks] = useState([]);
+  //const [hasMoreItems, setHasMoreItems] = useState(true);
+  //const [nextHref, setNextHref] = useState(null);
 
   const sortOptions = [
     'Most recent',
@@ -143,6 +149,7 @@ const Tracks = props => {
     'Price low',
     'On sale'
   ];
+
   const popularSearches = [
     'Devias React Dashboard',
     'Devias',
@@ -151,23 +158,11 @@ const Tracks = props => {
     'Pages'
   ];
 
-  /* useEffect(() => {
-    let mounted = true;
-
-    const fetchProjects = () => {
-      axios.get('/api/projects').then(response => {
-        if (mounted) {
-          setTracks(response.data.projects);
-        }
-      });
+  useEffect(() => {
+    window.onpopstate = () => {
+      clearTracks();
     };
-
-    fetchProjects();
-
-    return () => {
-      mounted = false;
-    };
-  }, []); */
+  }, [clearTracks]);
 
   const handleSortOpen = () => {
     setOpenSort(true);
@@ -219,30 +214,7 @@ const Tracks = props => {
       url = nextHref;
     }
 
-    axios.get(url)
-      .then(res => {
-        if(res) {
-          console.log(res.data.next_href);
-          var trackss = tracks;
-          res.data.collection.map(track => {
-            if(track.artwork_url == null) {
-              track.artwork_url = track.user.avatar_url;
-            }
-            trackss.push(track);
-            return track;
-          });
-
-          if(res.data.next_href) {
-            setTracks(trackss);
-            setNextHref(res.data.next_href);
-          } else {
-            setHasMoreItems(false);
-          }
-        }
-      })
-      .catch(err => {
-        console.error(err);
-      });
+    fetchTracks(url);
   };
 
   const loader = <CircularProgress className={classes.progress} color="secondary" style={{ color: '#D41' }} />
@@ -379,7 +351,26 @@ const Tracks = props => {
 };
 
 Tracks.propTypes = {
-  className: PropTypes.string
+  className: PropTypes.string,
+  tracks: PropTypes.array.isRequired,
+  nextHref: PropTypes.string.isRequired,
+  hasMoreItems: PropTypes.bool.isRequired,
+  fetchTracks: PropTypes.func.isRequired,
+  clearTracks: PropTypes.func.isRequired
 };
 
-export default Tracks;
+const mapStateToProps = (state) => ({
+  tracks: state.data.tracks,
+  nextHref: state.data.nextHref,
+  hasMoreItems: state.data.hasMoreItems
+});
+
+const mapActionsToProps = {
+  fetchTracks,
+  clearTracks
+};
+
+export default connect(
+  mapStateToProps,
+  mapActionsToProps
+)(Tracks);

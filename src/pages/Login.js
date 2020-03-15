@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import PropTypes from 'prop-types';
 import AppIcon from '../images/icon.png';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import clsx from 'clsx';
 
 //MUI Stuff
@@ -19,42 +18,39 @@ import {
 } from '@material-ui/core';
 import AuthTheme from '../utils/AuthTheme';
 
+// Redux Stuff
+import { connect } from 'react-redux';
+import { loginUser, getUserData } from '../redux/actions/userActions';
+
 
 const useStyles = makeStyles(AuthTheme);
 
 const Login = (props) => {
-  const { history, className } = props;
+
+  const { history, className, UI: { loading } } = props;
   const classes = useStyles();
 
   const INITIAL_USER_STATE = { email: '', password: '' };
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
   const [userData, setuserData] = useState(INITIAL_USER_STATE);
+  const [errors, setErrors] = useState({});
 
-  const postUserData = (newData) => {
-    axios.post('/login', newData)
-      .then(res => {
-         console.log(res.data);  //Store the token in LocalStorage so that we can use it later
-         localStorage.setItem('FBIdToken', `Bearer ${res.data.token}`);
-         setLoading(false);
-         history.push('/');
-      })
-      .catch(err => {
-        console.log(err);
-        setErrors(err.response.data);
-        setLoading(false);
-      });
-  };
+
+
+  useEffect(() => {
+    if(props.UI.errors){
+      setErrors(props.UI.errors);
+    }
+  }, [props.UI.errors]);
+
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setLoading(true);
     setuserData({
       email: userData.email,
       password: userData.password
     });
     console.log(userData);
-    postUserData(userData);
+    props.loginUser(userData, history);
   };
 
   const handleChange = (event) => {
@@ -136,7 +132,24 @@ const Login = (props) => {
 
 Login.propTypes = {
   history: PropTypes.object,
-  className: PropTypes.string
+  className: PropTypes.string,
+  getUserData: PropTypes.func,
+  user: PropTypes.object.isRequired,
+  UI: PropTypes.object.isRequired
 };
 
-export default Login;
+
+const mapStateToProps = (state) => ({
+  user: state.user,
+  UI: state.UI
+});
+
+const mapActionsToProps = {
+  loginUser,
+  getUserData
+}
+
+export default connect(
+  mapStateToProps,
+  mapActionsToProps
+)(Login);

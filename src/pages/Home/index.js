@@ -17,6 +17,10 @@ import YourFeed from './YourFeed';
 import TagFilter from './TagFilter';
 import Tags from './Tags';
 
+//Redux Stuff
+import { connect } from 'react-redux';
+
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -68,7 +72,7 @@ const Home = (props) => {
 
   const tabs = [];
 
-  if(authenticated === true){
+  if(authenticated){
     tabs.push({ value: 'yourfeed', label: 'Your Feed' });
     tabs.push({ value: 'globalfeed', label: 'Global Feed' });
     tabs.push({ value: 'tagfilter', label: 'Tag Filter' });
@@ -129,6 +133,12 @@ Home.propTypes = {
   authenticated: PropTypes.bool.isRequired
 };
 
-export default withRouter(Home);
+const mapStateToProps = (state) => ({
+  authenticated: state.user.authenticated,
+});
+
+export default connect(
+  mapStateToProps
+)(withRouter(Home))
 
 

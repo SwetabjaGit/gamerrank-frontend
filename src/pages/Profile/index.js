@@ -1,21 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import { 
-  Tabs, 
-  Tab, 
-  Divider, 
+  Tabs,
+  Tab,
+  Divider,
   colors,
 } from '@material-ui/core';
 import { withRouter, Redirect } from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import PropTypes from 'prop-types';
-import axios from 'axios';
 
 // Components
 import Header from './Header';
 import HeaderSkeleton from '../../utils/HeaderSkeleton';
+import ScreamSkeleton from '../../utils/ScreamSkeleton';
 import MyArticles from './MyArticles';
 import FavoritedArticles from './FavoritedArticles';
+
+// Redux Stuff
+import { connect } from 'react-redux';
+import { fetchProfile, clearProfile } from '../../redux/actions/dataActions';
+
 
 
 const useStyles = makeStyles((theme) => ({
@@ -46,33 +51,30 @@ const useStyles = makeStyles((theme) => ({
 
 const Profile = (props) => {
 
-  const { match, history, location } = props;
+  const { match, history, location, loading, profile, fetchProfile, clearProfile } = props;
   const classes = useStyles();
   const { userHandle, tab } = match.params;
-  const [user, setUser] = useState(null);
-  const [screams, setScreams] = useState(null);
+
+
+  useEffect(() => {
+    fetchProfile(userHandle);
+  }, [userHandle, fetchProfile]);
+
+  useEffect(() => {
+    console.log('Profile', profile);
+  }, [profile]);
+
+  useEffect(() => {
+    window.onpopstate = () => {
+      clearProfile();
+    };
+  }, [clearProfile]);
+
 
   const handleTabsChange = (event, value) => {
     history.push(value);
   };
 
-  useEffect(() => {
-
-    const fetchUserDetails = () => {
-      axios.get(`/user/${userHandle}`)
-        .then(res => {
-          console.log('UserDetails', res.data);
-          setUser(res.data.user);
-          setScreams(res.data.screams);
-        })
-        .catch(err => {
-          console.error(err);
-        });
-    };
-
-    fetchUserDetails();
-
-  }, [userHandle]);
 
   const tabs = [];
   tabs.push({ value: 'myarticles', label: 'My Articles' });
@@ -85,13 +87,16 @@ const Profile = (props) => {
     return <Redirect to="/" />;
   }
 
+  const displayHeader = profile.user ? (
+    <Header user={profile.user} />
+  ) : (
+    <HeaderSkeleton />
+  );
+
+
   return (
     <div className={classes.root}>
-      { user === null ? (
-          <HeaderSkeleton />
-        ) : (
-          <Header user={user} />
-      )}
+      { displayHeader }
       <Grid className={classes.feed} container spacing={1}>
         <Grid
           item 
@@ -117,8 +122,8 @@ const Profile = (props) => {
           <Divider className={classes.divider} />
           <div className={classes.content}>
             {console.log(location.pathname)}
-            {tab === 'myarticles' && <MyArticles screams={screams} />}
-            {tab === 'favorited' && <FavoritedArticles screams={screams} />}
+            {tab === 'myarticles' && <MyArticles screams={profile.screams} /> }
+            {tab === 'favorited' && <FavoritedArticles screams={profile.screams} /> }
           </div>
         </Grid>
         <Grid item sm={3} xs={12}>
@@ -129,12 +134,28 @@ const Profile = (props) => {
 };
 
 
-
 Profile.propTypes = {
   match: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
-  location: PropTypes.object.isRequired
+  location: PropTypes.object.isRequired,
+  loading: PropTypes.bool.isRequired,
+  profile: PropTypes.object.isRequired,
+  fetchProfile: PropTypes.func.isRequired,
+  clearProfile: PropTypes.func,
 };
 
-export default withRouter(Profile);
+const mapStateToProps = (state) => ({
+  profile: state.data.profile,
+  loading: state.UI.loading
+});
+
+const mapActionsToProps = {
+  fetchProfile,
+  clearProfile
+};
+
+export default connect(
+  mapStateToProps,
+  mapActionsToProps
+)(withRouter(Profile));
 

@@ -19,24 +19,9 @@ const FavoritedArticles = (props) => {
   
   const { screams } = props;
   const classes = useStyles();
-  //const [screams, setScreams] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 4;
-  
-  /* const fetchScreams = async (source) => {
-    await axios.get('/screams', { cancelToken: source.token })
-      .then(res => {
-        console.log(res.data);
-        setScreams(res.data)
-      })
-      .catch(err => {
-        if(axios.isCancel(err)) {
-          console.log("cancelled");
-        } else {
-          console.error(err);
-        }
-      });
-  }; */
+
 
   useEffect(() => {
     const CancelToken = axios.CancelToken;

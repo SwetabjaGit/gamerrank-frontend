@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/styles';
 import {
@@ -9,7 +8,6 @@ import {
   Avatar,
   Badge,
   Button,
-  ButtonGroup,
   IconButton,
   Toolbar,
   Hidden,
@@ -19,8 +17,6 @@ import {
 } from '@material-ui/core';
 
 //Icons
-import MenuIcon from '@material-ui/icons/Menu';
-import InputIcon from '@material-ui/icons/Input';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
@@ -30,12 +26,15 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import TrackChangesIcon from '@material-ui/icons/TrackChanges';
 
-
-import axios from '../utils/axios';
+//import axios from '../utils/axios';
 import useRouter from '../utils/useRouter';
 import PricingModal from './PricingModal';
 import NotificationsPopover from './NotificationsPopover';
 import NavbarButton from '../utils/NavbarButton';
+
+//Redux Stuff
+import { connect } from 'react-redux';
+import { logoutUser, getUserData, fetchNotifications } from '../redux/actions/userActions';
 
 
 const useStyles = makeStyles(theme => ({
@@ -69,7 +68,8 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Navbar = (props) => {
-  const { authenticated, currentUser, userImage } = props;
+  
+  const { authenticated, currentUser, userImage, logoutUser, notificationss, fetchNotifications } = props;
 
   const classes = useStyles();
   const { history } = useRouter();
@@ -80,22 +80,15 @@ const Navbar = (props) => {
 
 
   useEffect(() => {
-    let mounted = true;
+    if(authenticated){
+      fetchNotifications();
+    }
+  }, [authenticated, fetchNotifications]);
+  
+  useEffect(() => {
+    setNotifications(notificationss);
+  }, [notificationss]);
 
-    const fetchNotifications = () => {
-      axios.get('/api/account/notifications').then(response => {
-        if (mounted) {
-          setNotifications(response.data.notifications);
-        }
-      });
-    };
-
-    fetchNotifications();
-
-    return () => {
-      mounted = false;
-    };
-  }, [authenticated]);
 
   const handlePricingClose = () => {
     setPricingModalOpen(false);
@@ -108,13 +101,6 @@ const Navbar = (props) => {
   const handleNotificationsClose = () => {
     setOpenNotifications(false);
   };
-
-  const handleLogout = () => {
-    localStorage.removeItem('FBIdToken');
-    delete axios.defaults.headers.common['Authorization'];
-    history.push('/login');
-    //window.location.href = '/login';
-  }
 
   const signupIcon = (
     <NavbarButton key="Signup" tip="Signup" link="/signup" btnClassName={classes.notificationsButton}>
@@ -153,7 +139,7 @@ const Navbar = (props) => {
   );
 
   const signoutIcon = (
-    <NavbarButton key="Logout" tip="Logout" link="/login" btnClassName={classes.logoutButton} onClick={handleLogout}>
+    <NavbarButton key="Logout" tip="Logout" link="" btnClassName={classes.logoutButton} onClick={logoutUser}>
       <ExitToAppIcon />
     </NavbarButton>
   );
@@ -178,11 +164,10 @@ const Navbar = (props) => {
 
   const userProfile = (
     <Link
-      key={currentUser}
+      key="userProfile"
       to={`/profile/${currentUser}/myarticles`}
     >
       <Button
-        key={currentUser}
         className={classes.logoutButton}
         color="inherit"
       >
@@ -253,7 +238,32 @@ const Navbar = (props) => {
 
 Navbar.propTypes = {
   className: PropTypes.string,
-  onOpenNavBarMobile: PropTypes.func
+  onOpenNavBarMobile: PropTypes.func,
+  fetchNotifications: PropTypes.func,
+  logoutUser: PropTypes.func,
+  getUserData: PropTypes.func,
+  authenticated: PropTypes.bool,
+  currentUser: PropTypes.string,
+  userImage: PropTypes.string,
+  notificationss: PropTypes.array
 };
 
-export default Navbar;
+
+const mapStateToProps = (state) => ({
+  authenticated: state.user.authenticated,
+  currentUser: state.user.credentials.handle,
+  userImage: state.user.credentials.imageUrl,
+  notificationss: state.user.notificationsDummy
+});
+
+const mapActionsToProps = {
+  logoutUser,
+  getUserData,
+  fetchNotifications
+};
+
+
+export default connect(
+  mapStateToProps,
+  mapActionsToProps
+)(Navbar);

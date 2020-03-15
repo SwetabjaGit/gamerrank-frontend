@@ -55,7 +55,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const PostCard = props => {
-  const { scream, className, ...rest } = props;
+  const { article, className, ...rest } = props;
 
   const classes = useStyles();
 
@@ -70,8 +70,8 @@ const PostCard = props => {
             alt="Person"
             className={classes.avatar}
             component={RouterLink}
-            src={scream.userImage}            
-            to={`/profile/${scream.userHandle}/myarticles`}
+            src={article.userImage}            
+            to={`/profile/${article.userHandle}/myarticles`}
           />
         }
         disableTypography
@@ -79,17 +79,17 @@ const PostCard = props => {
           <div className={classes.subheader}>
             <AccessTimeIcon className={classes.accessTimeIcon} />
             <Typography variant="body2">
-              {moment(scream.createdAt).fromNow()}
+              {moment(article.createdAt).fromNow()}
             </Typography>
           </div>
         }
         title={
           <Link
-            to={`/profile/${scream.userHandle}/myarticles`}
+            to={`/profile/${article.userHandle}/myarticles`}
             variant="h6"
           >
             <Typography variant="body2">
-              {scream.userHandle}
+              {article.userHandle}
             </Typography>
             
           </Link>
@@ -100,24 +100,24 @@ const PostCard = props => {
           className={classes.message}
           variant="body1"
         >
-          {scream.body}
+          {article.body}
         </Typography>
-        {scream.media && (
+        {article.media && (
           <CardActionArea className={classes.mediaArea}>
             <CardMedia
               className={classes.media}
-              image={scream.media}
+              image={article.media}
             />
           </CardActionArea>
         )}
         <Reactions
           className={classes.reactions}
-          likeCount={scream.likeCount}
+          likeCount={article.likeCount}
         />
         <Divider className={classes.divider} />
-        {scream.comments && (
+        {article.comments && (
           <div className={classes.comments}>
-            {scream.comments.map(comment => (
+            {article.comments.map(comment => (
               <CommentBubble
                 comment={comment}
                 key={comment.createdAt}

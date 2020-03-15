@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Router, Route, Switch } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import ThemeProvider from '@material-ui/styles/ThemeProvider';
@@ -20,7 +20,15 @@ import Article from './pages/Article/index';
 import Settings from './pages/Settings';
 import './utils/accountMock';
 
-const useStyles = makeStyles(() => ({
+// Redux Stuff
+import { Provider } from 'react-redux';
+import store from './redux/store';
+import { SET_AUTHENTICATED } from './redux/types';
+import { logoutUser, getUserData } from './redux/actions/userActions';
+
+
+
+const useStyles = makeStyles((theme) => ({
   root: {
     height: '100%',
     width: '100%',
@@ -38,18 +46,19 @@ axios.defaults.baseURL = 'https://us-central1-socialape-d8699.cloudfunctions.net
 //axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 
 
-let authenticated = false;
 const token = localStorage.FBIdToken;
-if(token) {
+if (token) {
   const decodedToken = jwtDecode(token);
+  let authenticated;
+  console.log(decodedToken);
   if(decodedToken.exp * 1000 < Date.now()){
-    authenticated = false;
-    localStorage.removeItem('FBIdToken');
-    delete axios.defaults.headers.common['Authorization'];
+    store.dispatch(logoutUser());
     window.location.href = '/login';
   } else {
-    authenticated = true;
+    store.dispatch({ type: SET_AUTHENTICATED })
     axios.defaults.headers.common['Authorization'] = token;
+    store.dispatch(getUserData());
+    authenticated = store.getState().user.authenticated;
   }
   console.log('authenticated', authenticated);
 };
@@ -58,61 +67,37 @@ if(token) {
 const App = () => {
 
   const classes = useStyles();
-  const [currentUser, setCurrentUser] = useState(null);
-  const [userImage, setUserImage] = useState(null);
 
   const renderHome = () => {
     return (
-      <Home
-        history={history} 
-        authenticated={authenticated}
-      />
+      <Home history={history} />
     );
   };
 
-  useEffect(() => {
-    const fetchUserDetails = () => {
-      if(authenticated){
-        axios.get('/user')
-          .then(res => {
-            console.log(res.data.credentials.handle);
-            setCurrentUser(res.data.credentials.handle);
-            setUserImage(res.data.credentials.imageUrl);
-          })
-          .catch(err => {
-            console.error(err);
-          });
-      }
-    };
-    fetchUserDetails();
-  }, []);
-
   return (
     <ThemeProvider theme={theme}>
-      <div className={classes.root}>
-        <Router history={history}>
-          <Navbar 
-            authenticated={authenticated}
-            currentUser={currentUser}
-            userImage={userImage} 
-          />
-          <div className={classes.mainContent}>
-            <Switch>
-              <Route exact path="/" component={renderHome} />
-              <Route exact path="/tracks" component={Tracks} />
-              <Route exact path="/login" component={Login} />
-              <Route exact path="/signup" component={Signup} />
-              <Route exact path="/settings" component={Settings} />
-              <Route exact path="/newarticle" component={NewArticle} />
-              <Route exact path="/newarticle/:slug" component={NewArticle} />
-              <Route exact path="/:tab" component={renderHome} />
-              <Route exact path="/profile/:userHandle" component={Profile} />
-              <Route exact path="/profile/:userHandle/:tab" component={Profile} />
-              <Route exact path="/article/:articleId" component={Article} />
-            </Switch>
-          </div>
-        </Router>
-      </div>
+      <Provider store={store}>
+        <div className={classes.root}>
+          <Router history={history}>
+            <Navbar />
+            <div className={classes.mainContent}>
+              <Switch>
+                <Route exact path="/" component={renderHome} />
+                <Route exact path="/tracks" component={Tracks} />
+                <Route exact path="/login" component={Login} />
+                <Route exact path="/signup" component={Signup} />
+                <Route exact path="/settings" component={Settings} />
+                <Route exact path="/newarticle" component={NewArticle} />
+                <Route exact path="/newarticle/:slug" component={NewArticle} />
+                <Route exact path="/:tab" component={renderHome} />
+                <Route exact path="/profile/:userHandle" component={Profile} />
+                <Route exact path="/profile/:userHandle/:tab" component={Profile} />
+                <Route exact path="/article/:articleId" component={Article} />
+              </Switch>
+            </div>
+          </Router>
+        </div>
+      </Provider>
     </ThemeProvider>
   );
 };

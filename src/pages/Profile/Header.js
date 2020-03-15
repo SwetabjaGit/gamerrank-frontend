@@ -7,7 +7,6 @@ import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton'; 
 import PropTypes from 'prop-types';
 import axios from 'axios';
-//import clsx from 'clsx';
 //import HeaderImage from '../../images/beast-logo.png';
 
 // Icons
@@ -301,129 +300,129 @@ const Header = (props) => {
 
   return (
     <div className={classes.root}>
-      <div className={classes.inner}>
-        <Grid container spacing={3}>
-          <Grid item xs={3} sm={3}>
-            <div className={classes.profile}>
-              <div className="image-wrapper">
-                <input
-                  type="file" 
-                  id="imageInput"
-                  hidden="hidden"
-                  onChange={handleImageChange}
-                />
-                <img
-                  src={user.imageUrl}
-                  alt="profile"
-                  className="profile-image"
-                  onClick={handleEditPicture}
-                />
-                <Tooltip title="ChangeImage" placement="bottom" aria-label="add">
-                  <IconButton className={classes.button} color="inherit" onClick={handleEditPicture}>
-                    <EditIcon
-                      color="primary"
-                      className={classes.imagePicker}
-                    />
-                  </IconButton>
-                </Tooltip>
+        <div className={classes.inner}>
+          <Grid container spacing={3}>
+            <Grid item xs={3} sm={3}>
+              <div className={classes.profile}>
+                <div className="image-wrapper">
+                  <input
+                    type="file" 
+                    id="imageInput"
+                    hidden="hidden"
+                    onChange={handleImageChange}
+                  />
+                  <img
+                    src={user.imageUrl}
+                    alt="profile"
+                    className="profile-image"
+                    onClick={handleEditPicture}
+                  />
+                  <Tooltip title="ChangeImage" placement="bottom" aria-label="add">
+                    <IconButton className={classes.button} color="inherit" onClick={handleEditPicture}>
+                      <EditIcon
+                        color="primary"
+                        className={classes.imagePicker}
+                      />
+                    </IconButton>
+                  </Tooltip>
+                </div>
               </div>
-            </div>
-            <div className={classes.infoBox}>
+              <div className={classes.infoBox}>
+                <Typography
+                  className={classes.bannerText1}
+                  variant="h1"
+                >
+                  { user.handle }
+                </Typography>
+                <Typography
+                  className={classes.bannerText2}
+                  variant="h5"
+                >
+                  { user.bio }
+                </Typography>
+                <Typography
+                  className={classes.bannerText2}
+                  variant="h5"
+                >
+                  { user.location }
+                </Typography>
+                <Typography
+                  className={classes.bannerText2}
+                  variant="h5"
+                >
+                  { user.website }
+                </Typography>
+              </div>
+            </Grid>
+            <Grid item xs={3} sm={3} className={classes.dataBox}>
               <Typography
-                className={classes.bannerText1}
+                className={classes.dataText1}
                 variant="h1"
               >
-                { user.handle }
+                { user.postCount }
               </Typography>
               <Typography
-                className={classes.bannerText2}
+                className={classes.dataText2}
                 variant="h5"
               >
-                { user.bio }
+                Posts
+              </Typography>
+            </Grid>
+            <Grid item xs={3} sm={3} className={classes.dataBox}>
+              <Typography
+                className={classes.dataText1}
+                variant="h1"
+              >
+                { user.followerCount }
               </Typography>
               <Typography
-                className={classes.bannerText2}
+                className={classes.dataText2}
                 variant="h5"
               >
-                { user.location }
+                Followers
+              </Typography>
+            </Grid>
+            <Grid item xs={3} sm={3} className={classes.dataBox}>
+              <Typography
+                className={classes.dataText1}
+                variant="h1"
+              >
+                { user.followingCount }
               </Typography>
               <Typography
-                className={classes.bannerText2}
+                className={classes.dataText2}
                 variant="h5"
               >
-                { user.website }
+                Following
               </Typography>
-            </div>
+            </Grid>
+            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+              <div className={classes.rowBox}>
+                {
+                  followId === null ? (
+                    followedId !== null ? (
+                      followedBack === true ? buttonRevokeFollowBack : buttonFollowBack
+                    ) : buttonFollow
+                  ) : buttonUnfollow
+                }
+                <Button
+                  variant="outlined"
+                  color="default"
+                  className={classes.buttonOutlined}
+                >
+                  Message
+                </Button>
+                <Button 
+                  variant="outlined"
+                  color="default"
+                  className={classes.buttonOutlined}
+                >
+                  Email
+                </Button>
+              </div>
+            </Grid>
           </Grid>
-          <Grid item xs={3} sm={3} className={classes.dataBox}>
-            <Typography
-              className={classes.dataText1}
-              variant="h1"
-            >
-              { user.postCount }
-            </Typography>
-            <Typography
-              className={classes.dataText2}
-              variant="h5"
-            >
-              Posts
-            </Typography>
-          </Grid>
-          <Grid item xs={3} sm={3} className={classes.dataBox}>
-            <Typography
-              className={classes.dataText1}
-              variant="h1"
-            >
-              { user.followerCount }
-            </Typography>
-            <Typography
-              className={classes.dataText2}
-              variant="h5"
-            >
-              Followers
-            </Typography>
-          </Grid>
-          <Grid item xs={3} sm={3} className={classes.dataBox}>
-            <Typography
-              className={classes.dataText1}
-              variant="h1"
-            >
-              { user.followingCount }
-            </Typography>
-            <Typography
-              className={classes.dataText2}
-              variant="h5"
-            >
-              Following
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <div className={classes.rowBox}>
-              {
-                followId === null ? (
-                  followedId !== null ? (
-                    followedBack === true ? buttonRevokeFollowBack : buttonFollowBack
-                  ) : buttonFollow
-                ) : buttonUnfollow
-              }
-              <Button
-                variant="outlined"
-                color="default"
-                className={classes.buttonOutlined}
-              >
-                Message
-              </Button>
-              <Button 
-                variant="outlined"
-                color="default"
-                className={classes.buttonOutlined}
-              >
-                Email
-              </Button>
-            </div>
-          </Grid>
-        </Grid>
-      </div>
+        </div>
     </div>
   );
 };

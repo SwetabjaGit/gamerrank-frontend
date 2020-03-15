@@ -1,13 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import { colors } from '@material-ui/core';
 import { withRouter } from 'react-router-dom';
-import axios from 'axios';
-//import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 // Components
 import Header from '../../components/Header';
 import PostCard from './PostCard';
+
+// Redux Stuff
+import { connect } from 'react-redux';
+import { fetchOneArticle, clearArticle } from '../../redux/actions/dataActions';
+
 
 
 const useStyles = makeStyles((theme) => ({
@@ -55,62 +60,81 @@ const useStyles = makeStyles((theme) => ({
   post: {
     marginBottom: theme.spacing(2)
   },
+  spinnerDiv: {
+    textAlign: 'center',
+    marginTop: 50,
+    marginBottom: 50
+  },
 }));
 
 
 const Article = (props) => {
 
-  const { match } = props;
+  const { match, article, fetchOneArticle, loading, clearArticle } = props;
   const classes = useStyles();
-  const screamId = match.params.articleId;
+  const articleId = match.params.articleId;
 
-  const [scream, setScream] = useState({});
-
+  // Clear Article payload on Back press
+  useEffect(() => {
+    window.onpopstate = () => {
+      clearArticle();
+    };
+  }, [clearArticle]);
 
   useEffect(() => {
-    const CancelToken = axios.CancelToken;
-    const source = CancelToken.source();
+    fetchOneArticle(articleId);
+  }, [articleId, fetchOneArticle]);
 
-    const fetchScream = async (source) => {
-      console.log('screamId', match.params.articleId);
-      await axios.get(`/scream/${screamId}`, { cancelToken: source.token })
-        .then(res => {
-          console.log(res.data);
-          setScream(res.data)
-        })
-        .catch(err => {
-          if(axios.isCancel(err)) {
-            console.log("cancelled");
-          } else {
-            console.error(err);
-          }
-        });
-    };
+  useEffect(() => {
+    console.log(article);
+  }, [article]);
+  
 
-    fetchScream(source);
+  const displayArticleCard = loading ? (
+    <div className={classes.spinnerDiv}>
+      <CircularProgress size={200} thickness={2} />
+    </div>
+  ) : (
+    <div className={classes.posts}>
+      <PostCard
+        className={classes.post}
+        key={articleId}
+        article={article}
+      />
+    </div>
+  );
 
-    return () => {
-      source.cancel();
-    };
-  }, [match.params.articleId, screamId]);
-
+  
   return (
     <div className={classes.root}>
       <Header
         title="This is the TITLE"
         description="This is the Description"
       />
-      <div className={classes.posts}>
-        <PostCard
-          className={classes.post}
-          key={screamId}
-          scream={scream}
-        />
-      </div>
+      { displayArticleCard }
     </div>
   );
 
-
 };
 
-export default withRouter(Article);
+Article.propTypes = {
+  article: PropTypes.object.isRequired,
+  loading: PropTypes.bool.isRequired,
+  fetchOneArticle: PropTypes.func.isRequired,
+  clearArticle: PropTypes.func.isRequired
+};
+
+const mapStateToProps = (state) => ({
+  article: state.data.article,
+  loading: state.UI.loading
+});
+
+const mapActionsToProps = {
+  fetchOneArticle,
+  clearArticle
+};
+
+export default connect(
+  mapStateToProps,
+  mapActionsToProps
+)(withRouter(Article));
