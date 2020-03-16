@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import { 
   Tabs,
@@ -13,7 +13,6 @@ import PropTypes from 'prop-types';
 // Components
 import Header from './Header';
 import HeaderSkeleton from '../../utils/HeaderSkeleton';
-import ScreamSkeleton from '../../utils/ScreamSkeleton';
 import MyArticles from './MyArticles';
 import FavoritedArticles from './FavoritedArticles';
 
@@ -51,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Profile = (props) => {
 
-  const { match, history, location, loading, profile, fetchProfile, clearProfile } = props;
+  const { match, history, location, profile, fetchProfile, clearProfile } = props;
   const classes = useStyles();
   const { userHandle, tab } = match.params;
 

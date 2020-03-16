@@ -138,9 +138,7 @@ const Tracks = props => {
   const [openSort, setOpenSort] = useState(false);
   const [selectedSort, setSelectedSort] = useState('Most popular');
   const [mode, setMode] = useState('grid');
-  //const [tracks, setTracks] = useState([]);
-  //const [hasMoreItems, setHasMoreItems] = useState(true);
-  //const [nextHref, setNextHref] = useState(null);
+
 
   const sortOptions = [
     'Most recent',
@@ -321,7 +319,7 @@ const Tracks = props => {
                 sm={12}
                 xs={12}
               >
-                <GridCard track={track} />
+                <GridCard key={track.id} track={track} />
               </Grid>
             ))}
           </Grid>
@@ -353,10 +351,10 @@ const Tracks = props => {
 Tracks.propTypes = {
   className: PropTypes.string,
   tracks: PropTypes.array.isRequired,
-  nextHref: PropTypes.string.isRequired,
   hasMoreItems: PropTypes.bool.isRequired,
   fetchTracks: PropTypes.func.isRequired,
-  clearTracks: PropTypes.func.isRequired
+  clearTracks: PropTypes.func.isRequired,
+  nextHref: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({

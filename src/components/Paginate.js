@@ -16,7 +16,7 @@ const Paginate = props => {
   return (
     <div className="pagination-wrapper">
 
-      <Pagination size="lg" aria-label="Page navigation example">
+      <Pagination size="md" aria-label="Page navigation example">
         <PaginationItem disabled={currentPage <= 0}>
           <PaginationLink onClick={e => handleClick(e, 0)} first href="#" />
         </PaginationItem>

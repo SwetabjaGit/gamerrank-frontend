@@ -89,6 +89,7 @@ const Article = (props) => {
     console.log(article);
   }, [article]);
   
+  
 
   const displayArticleCard = loading ? (
     <div className={classes.spinnerDiv}>

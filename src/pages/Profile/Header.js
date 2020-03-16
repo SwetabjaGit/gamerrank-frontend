@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import blueGrey from '@material-ui/core/colors/blueGrey';
 import Typography from '@material-ui/core/Typography';
@@ -6,12 +6,23 @@ import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton'; 
 import PropTypes from 'prop-types';
-import axios from 'axios';
-//import HeaderImage from '../../images/beast-logo.png';
 
 // Icons
 import EditIcon from '@material-ui/icons/Edit';
 import Grid from '@material-ui/core/Grid';
+
+// Redux Stuff
+import { connect } from 'react-redux';
+import { 
+  findFollower,
+  findFollowed,
+  handleFollow,
+  handleUnfollow,
+  handleFollowBack,
+  handleRevokeFollowBack,
+  clearFollower
+} from '../../redux/actions/userActions';
+
 
 
 const useStyles = makeStyles(theme => ({
@@ -145,103 +156,38 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Header = (props) => {
-  const { user } = props;
+
+  const {
+    user, followId, followedId, followedBack,
+    findFollower, findFollowed, handleFollow,
+    handleUnfollow, handleFollowBack,
+    handleRevokeFollowBack, clearFollower
+  } = props;
   const classes = useStyles();
-  const [followId, setFollowId]= useState(null);
-  const [followedId, setFollowedId] = useState(null);
-  const [followedBack, setFollowedBack] = useState(false);
-  //axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
-  axios.defaults.headers.common['Authorization'] = localStorage.getItem('FBIdToken');
+
+  
+  useEffect(() => {
+    clearFollower();
+  }, [clearFollower]);
 
   useEffect(() => {
-
-    const findFollower = () => {
-      axios.get(`/findfollower/${user.handle}`)
-        .then(res => {
-          setFollowId(res.data.followId);
-          setFollowedBack(false);
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    };
-    
-    const findFollowed = () => {
-      axios.get(`/findfollowed/${user.handle}`)
-        .then(res => {
-          setFollowedId(res.data.followedId);
-          setFollowedBack(res.data.followedBack);
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    };
-
-    findFollower();
-    findFollowed();
-
-  }, [user.handle]);
-
+    findFollower(user.handle);
+    findFollowed(user.handle);
+  }, [findFollower, findFollowed, user.handle]);
 
   useEffect(() => {
-    console.log(followId);
+    console.log('followId', followId);
   }, [followId]);
 
   useEffect(() => {
-    console.log(followedId);
+    console.log('followedId', followedId);
   }, [followedId]);
 
   useEffect(() => {
-    console.log('FollowedBack', followedBack);
+    console.log('followedBack', followedBack);
   }, [followedBack]);
 
-  const handleFollow = () => {
-    console.log('HandleFollow Called');
-    axios.post(`/user/${user.handle}/follow`)
-      .then(res => {
-        console.log(`${user.handle} followed`);
-        setFollowId(res.data.followId);
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  };
-
-  const handleUnfollow = () => {
-    console.log('HandleUnfollow Called');
-    axios.delete(`/user/${followId}/unfollow`)
-      .then(res => {
-        console.log(`${user.handle} unfollowed`);
-        setFollowId(null);
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  };
-
-  const handleFollowBack = () => {
-    console.log('HandleFollowBack Called');
-    axios.post(`/user/${followedId}/followBack`)
-      .then(res => {
-        console.log(`${user.handle} followed back`);
-        setFollowedBack(true);
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  };
-
-  const handleRevokeFollowBack = () => {
-    console.log('RevokeFollowBack Called');
-    axios.post(`/user/${followedId}/revokeFollowBack`)
-      .then(res => {
-        console.log(`${user.handle} Unfollowed`);
-        setFollowedBack(false);
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  };
+  
 
   const handleImageChange = (event) => {
     const image = event.target.files[0];
@@ -257,9 +203,9 @@ const Header = (props) => {
   const buttonFollow = (
     <Button
       variant="contained"
-      color="primary" 
+      color="primary"
       className={classes.buttonSolid}
-      onClick={handleFollow}
+      onClick={() => handleFollow(user.handle)}
     >
       Follow
     </Button>
@@ -270,7 +216,7 @@ const Header = (props) => {
       variant="outlined"
       color="primary" 
       className={classes.buttonOutlined}
-      onClick={handleUnfollow}
+      onClick={() => handleUnfollow(followId, user.handle)}
     >
       Unfollow
     </Button>
@@ -281,7 +227,7 @@ const Header = (props) => {
       variant="contained"
       color="primary" 
       className={classes.buttonSolid}
-      onClick={handleFollowBack}
+      onClick={() => handleFollowBack(followedId, user.handle)}
     >
       Follow Back
     </Button>
@@ -292,7 +238,7 @@ const Header = (props) => {
       variant="outlined"
       color="primary" 
       className={classes.buttonOutlined}
-      onClick={handleRevokeFollowBack}
+      onClick={() => handleRevokeFollowBack(followedId, user.handle)}
     >
       Revoke FollowBack
     </Button>
@@ -428,7 +374,30 @@ const Header = (props) => {
 };
 
 Header.propTypes = {
-  className: PropTypes.string
+  className: PropTypes.string,
+  followId: PropTypes.string,
+  followedId: PropTypes.string,
+  followedBack: PropTypes.bool.isRequired,
+  clearFollower: PropTypes.func.isRequired
 };
 
-export default Header;
+const mapStateToProps = (state) => ({
+  followId: state.user.followId,
+  followedId: state.user.followedId,
+  followedBack: state.user.followedBack
+});
+
+const mapActionsToProps = {
+  findFollower,
+  findFollowed,
+  handleFollow,
+  handleUnfollow,
+  handleFollowBack,
+  handleRevokeFollowBack,
+  clearFollower
+};
+
+export default connect(
+  mapStateToProps,
+  mapActionsToProps
+)(Header);

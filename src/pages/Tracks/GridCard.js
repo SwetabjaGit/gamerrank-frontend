@@ -133,7 +133,7 @@ const GridCard = props => {
             >
               {track.user.username.substring(0, 15)}
             </Link>{' '}
-            | Updated: {moment(track.last_modified).fromNow()}
+            | {moment(track.last_modified, "YYYY-MM-DD").fromNow()}
           </Typography>
         }
       />
@@ -196,7 +196,7 @@ const GridCard = props => {
           >
             <Grid md={2} item>
               <Typography className={classes.boldText} variant="h5">
-                {moment.utc(moment.duration(track.duration).asMilliseconds()).format("m:ss")}
+                { moment.utc(moment.duration(track.duration).asMilliseconds()).format("m:ss") }
               </Typography>
               <Typography className={classes.centerText} variant="body2">Duration</Typography>
             </Grid>

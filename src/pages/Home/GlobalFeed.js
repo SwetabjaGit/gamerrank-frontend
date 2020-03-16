@@ -15,16 +15,18 @@ import { fetchArticles } from '../../redux/actions/dataActions';
 
 const useStyles = makeStyles(() => ({
   paginateBox: {
-    width: '100%',
+    minWidth: '100%',
     alignContent: 'center',
-    margin: 15
+    margin: 25,
+    marginLeft: 200,
+    zoom: 1.2
   }
 }));
 
 const GlobalFeed = (props) => {
   
   const classes = useStyles();
-  const { articles, fetchArticles } = props;
+  const { articles, fetchArticles, loading } = props;
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 4;
 
@@ -34,10 +36,10 @@ const GlobalFeed = (props) => {
   }, [fetchArticles]);
 
 
-  const articlesList = articles ? (
-    articles.map(scream => <ArticleItem key={scream.screamId} scream={scream}></ArticleItem>)
-  ) : (
+  const articlesList = loading ? (
     <ScreamSkeleton />
+  ) : (
+    articles.map(scream => <ArticleItem key={scream.screamId} scream={scream}></ArticleItem>)
   );
 
   let pagesCount = articlesList.length > 0 ? Math.ceil(articlesList.length / itemsPerPage) : 6;
