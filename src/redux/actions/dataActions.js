@@ -15,7 +15,10 @@ import {
   LOADING_TRACKS,
   STOP_LOADING_TRACKS,
   LOADING_PROFILE,
-  STOP_LOADING_PROFILE
+  STOP_LOADING_PROFILE,
+  FILTER_BY_TAG,
+  LOADING_TAG_ARTICLE,
+  STOP_LOADING_TAG_ARTICLE
 } from '../types';
 import axios from 'axios';
 
@@ -48,9 +51,28 @@ export const setArticles = (data) => (dispatch) => {
 };
 
 
+export const fetchArticlesByTag = (tag) => (dispatch) => {
+  dispatch({ type: LOADING_UI });
+  dispatch({ type: LOADING_TAG_ARTICLE });
+  axios.get(`/screams/${tag}`)
+    .then(res => {
+      dispatch({
+        type: FILTER_BY_TAG,
+        payload: res.data
+      });
+      dispatch(clearErrors());
+      dispatch({ type: STOP_LOADING_TAG_ARTICLE });
+    })
+    .catch(err => {
+      console.error(err);
+      dispatch(setErrors(err));
+      dispatch({ type: STOP_LOADING_TAG_ARTICLE });
+    });
+};
+
+
 export const fetchOneArticle = (articleId) => (dispatch) => {
   dispatch({ type: LOADING_UI });
-  console.log('Fetching Article using Actions');
   axios.get(`/scream/${articleId}`)
     .then((res) => {
       dispatch({

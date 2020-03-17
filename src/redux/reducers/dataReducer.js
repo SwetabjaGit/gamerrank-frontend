@@ -11,17 +11,22 @@ import {
   LOADING_PROFILE,
   STOP_LOADING_PROFILE,
   LOADING_TRACKS,
-  STOP_LOADING_TRACKS
+  STOP_LOADING_TRACKS,
+  FILTER_BY_TAG,
+  LOADING_TAG_ARTICLE,
+  STOP_LOADING_TAG_ARTICLE
 } from '../types';
 
 const initialState = {
   articles: [],
+  tagArticles: [],
   article: {},
   profile: {},
   tracks: [],
   nextHref: null,
   hasMoreItems: true,
   loading: false,
+  loadingTagArticles: false,
   loadingArticles: false,
   loadingProfile: false,
   loadingTracks: false
@@ -45,6 +50,21 @@ export default (state = initialState, action) => {
         ...state,
         loading: false,
         loadingArticles: false
+      };
+    case FILTER_BY_TAG:
+      return {
+        ...state,
+        tagArticles: action.payload
+      };
+    case LOADING_TAG_ARTICLE:
+      return {
+        ...state,
+        loadingTagArticles: true
+      };
+    case STOP_LOADING_TAG_ARTICLE:
+      return {
+        ...state,
+        loadingTagArticles: false
       };
     case SET_ARTICLE:
       return {

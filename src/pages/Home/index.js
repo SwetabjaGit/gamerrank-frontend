@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import { 
   Tabs, 
@@ -19,6 +19,7 @@ import Tags from './Tags';
 
 //Redux Stuff
 import { connect } from 'react-redux';
+import { fetchArticles } from '../../redux/actions/dataActions';
 
 
 
@@ -62,9 +63,15 @@ const useStyles = makeStyles((theme) => ({
 
 const Home = (props) => {
 
-  const { match, history, authenticated } = props;
+  const { match, history, authenticated, fetchArticles } = props;
   const classes = useStyles();
   const { tab } = match.params;
+
+
+  useEffect(() => {
+    fetchArticles();
+  }, [fetchArticles]);
+
 
   const handleTabsChange = (event, value) => {
     history.push(value);
@@ -127,6 +134,7 @@ const Home = (props) => {
 };
 
 Home.propTypes = {
+  fetchArticles: PropTypes.func.isRequired,
   match: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
   location: PropTypes.object.isRequired,
@@ -137,8 +145,13 @@ const mapStateToProps = (state) => ({
   authenticated: state.user.authenticated,
 });
 
+const mapActionsToProps = {
+  fetchArticles
+};
+
 export default connect(
-  mapStateToProps
+  mapStateToProps,
+  mapActionsToProps
 )(withRouter(Home))
 
 

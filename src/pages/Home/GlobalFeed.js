@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import ArticleItem from '../../components/ArticleItem';
-import Paginate from '../../components/Paginate';
 import { makeStyles } from '@material-ui/styles';
 import PropTypes from 'prop-types';
 
 //Components
 import ScreamSkeleton from '../../utils/ScreamSkeleton';
+import ArticleItem from '../../components/ArticleItem';
+import Paginate from '../../components/Paginate';
 
 // Redux Stuff
 import { connect } from 'react-redux';
-import { fetchArticles } from '../../redux/actions/dataActions';
 
 
 
@@ -26,14 +25,14 @@ const useStyles = makeStyles(() => ({
 const GlobalFeed = (props) => {
   
   const classes = useStyles();
-  const { articles, fetchArticles, loading } = props;
+  const { articles, loading } = props;
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 4;
 
 
   useEffect(() => {
-    fetchArticles();
-  }, [fetchArticles]);
+    console.log(articles);
+  }, [articles])
 
 
   const articlesList = loading ? (
@@ -46,7 +45,6 @@ const GlobalFeed = (props) => {
 
   const paginatedList = articlesList.length > 0 ? 
     articlesList.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage) : articlesList;
-
     
 
   return (
@@ -78,7 +76,6 @@ const mapStateToProps = (state) => ({
 });
 
 const mapActionsToProps = {
-  fetchArticles
 };
 
 export default connect(

@@ -3,6 +3,12 @@ import axios from 'axios';
 import Typography from '@material-ui/core/Typography';
 import Chip from '@material-ui/core/Chip';
 import { makeStyles } from '@material-ui/styles';
+import PropTypes from 'prop-types';
+
+// Redux Stuff
+import { connect } from 'react-redux';
+import { fetchArticlesByTag } from '../../redux/actions/dataActions';
+
 
 
 const useStyles = makeStyles((theme) => ({
@@ -25,10 +31,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Tags = () => {
+const Tags = (props) => {
 
   const [tags, setTags] = useState(null);
   const classes = useStyles();
+  const { fetchArticlesByTag } = props;
 
   const fetchTags = async (source) => {
     await axios.get('/tags', { cancelToken: source.token })
@@ -55,6 +62,11 @@ const Tags = () => {
     return '#' + str;
   };
 
+  const handleTagClick = (tag) => {
+    console.log('SelectedTag', tag);
+    fetchArticlesByTag(tag);
+  };
+
   const renderTags = tags ? (
     tags.map(tag => 
       <Chip
@@ -62,7 +74,8 @@ const Tags = () => {
         label={tag} 
         component="a" 
         href={createTag(tag)} 
-        clickable 
+        clickable
+        onClick={() => handleTagClick(tag)}
         style={{
           backgroundColor: '#687077',
           color: '#fff'
@@ -78,4 +91,21 @@ const Tags = () => {
   );
 };
 
-export default Tags;
+
+Tags.propTypes = {
+  fetchArticlesByTag: PropTypes.func.isRequired,
+  tagArticles: PropTypes.array.isRequired
+};
+
+const mapStateToProps = (state) => ({
+  tagArticles: state.data.tagArticles
+});
+
+const mapActionsToProps = {
+  fetchArticlesByTag
+};
+
+export default connect(
+  mapStateToProps,
+  mapActionsToProps
+)(Tags);

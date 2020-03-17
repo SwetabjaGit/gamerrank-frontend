@@ -28,7 +28,7 @@ const YourFeed = () => {
   const api = {
     baseUrl: 'https://api.soundcloud.com',
     user_id: '94957189',
-    client_id: 'sttWEuQHjL9Wqu5vwNb0iNf52zXFtQvs'
+    client_id: 'caf73ef1e709f839664ab82bef40fa96'
   };
 
   const fetchMoreData = () => {
