@@ -1,13 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import { 
   Tabs,
   Tab,
   Divider,
   colors,
+  Grid,
 } from '@material-ui/core';
 import { withRouter, Redirect } from 'react-router-dom';
-import Grid from '@material-ui/core/Grid';
+import Snackbar from '@material-ui/core/Snackbar';
+import Alert from '../../utils/Alert';
 import PropTypes from 'prop-types';
 
 // Components
@@ -19,6 +21,12 @@ import FavoritedArticles from './FavoritedArticles';
 // Redux Stuff
 import { connect } from 'react-redux';
 import { fetchProfile, clearProfile } from '../../redux/actions/dataActions';
+import { 
+  hideFollowAlert,
+  hideUnfollowAlert,
+  hideFollowbackAlert,
+  hideRevokefollowAlert
+} from '../../redux/actions/userActions';
 
 
 
@@ -50,18 +58,23 @@ const useStyles = makeStyles((theme) => ({
 
 const Profile = (props) => {
 
-  const { match, history, location, profile, fetchProfile, clearProfile } = props;
+  const { 
+    match, history, 
+    profile, fetchProfile, clearProfile,
+    hideFollowAlert, hideUnfollowAlert,
+    hideFollowbackAlert, hideRevokefollowAlert
+  } = props;
   const classes = useStyles();
   const { userHandle, tab } = match.params;
+  const [openFAlert, setOpenFAlert] = useState(false);
+  const [openUAlert, setOpenUAlert] = useState(false);
+  const [openFBAlert, setOpenFBAlert] = useState(false);
+  const [openUBAlert, setOpenUBAlert] = useState(false);
 
 
   useEffect(() => {
     fetchProfile(userHandle);
   }, [userHandle, fetchProfile]);
-
-  useEffect(() => {
-    console.log('Profile', profile);
-  }, [profile]);
 
   useEffect(() => {
     window.onpopstate = () => {
@@ -86,8 +99,63 @@ const Profile = (props) => {
     return <Redirect to="/" />;
   }
 
+
+  const handleFOpen = () => {
+    setOpenFAlert(true);
+  };
+
+  const handleUOpen = () => {
+    setOpenUAlert(true);
+  };
+
+  const handleFBOpen = () => {
+    setOpenFBAlert(true);
+  };
+
+  const handleUBOpen = () => {
+    setOpenUBAlert(true);
+  };
+
+  const handleFClose = (event, reason) => {
+    if(reason === 'clickaway') {
+      return;
+    }
+    setOpenFAlert(false);
+    hideFollowAlert();
+  };
+
+  const handleUClose = (event, reason) => {
+    if(reason === 'clickaway') {
+      return;
+    }
+    setOpenUAlert(false);
+    hideUnfollowAlert();
+  };
+
+  const handleFBClose = (event, reason) => {
+    if(reason === 'clickaway') {
+      return;
+    }
+    setOpenFBAlert(false);
+    hideFollowbackAlert();
+  };
+
+  const handleUBClose = (event, reason) => {
+    if(reason === 'clickaway') {
+      return;
+    }
+    setOpenUBAlert(false);
+    hideRevokefollowAlert();
+  };
+
   const displayHeader = profile.user ? (
-    <Header user={profile.user} />
+    <Header 
+      user={profile.user} 
+      openFollowAlert={handleFOpen}
+      openUnfollowAlert={handleUOpen} 
+      openFollowbackAlert={handleFBOpen}
+      openRevokefollowAlert={handleUBOpen}
+    />
   ) : (
     <HeaderSkeleton />
   );
@@ -96,6 +164,26 @@ const Profile = (props) => {
   return (
     <div className={classes.root}>
       { displayHeader }
+      <Snackbar open={openFAlert} autoHideDuration={4000} onClose={handleFClose}>
+        <Alert onClose={handleFClose} severity="success" variant="filled">
+          {profile.user && profile.user.handle} Followed Successfully
+        </Alert>
+      </Snackbar>
+      <Snackbar open={openUAlert} autoHideDuration={4000} onClose={handleUClose}>
+        <Alert onClose={handleUClose} severity="error" variant="filled">
+          {profile.user && profile.user.handle} Unfollowed Successfully
+        </Alert>
+      </Snackbar>
+      <Snackbar open={openFBAlert} autoHideDuration={4000} onClose={handleFBClose}>
+        <Alert onClose={handleFBClose} severity="info" variant="filled">
+          {profile.user && profile.user.handle} Followed Back Successfully
+        </Alert>
+      </Snackbar>
+      <Snackbar open={openUBAlert} autoHideDuration={4000} onClose={handleUBClose}>
+        <Alert onClose={handleUBClose} severity="warning" variant="filled">
+          {profile.user && profile.user.handle} Unfollowed Back Successfully
+        </Alert>
+      </Snackbar>
       <Grid className={classes.feed} container spacing={1}>
         <Grid
           item 
@@ -120,7 +208,7 @@ const Profile = (props) => {
           </Tabs>
           <Divider className={classes.divider} />
           <div className={classes.content}>
-            {console.log(location.pathname)}
+            {/* {console.log(location.pathname)} */}
             {tab === 'myarticles' && <MyArticles screams={profile.screams} /> }
             {tab === 'favorited' && <FavoritedArticles screams={profile.screams} /> }
           </div>
@@ -141,6 +229,10 @@ Profile.propTypes = {
   profile: PropTypes.object.isRequired,
   fetchProfile: PropTypes.func.isRequired,
   clearProfile: PropTypes.func,
+  hideFollowAlert: PropTypes.func.isRequired,
+  hideUnfollowAlert: PropTypes.func.isRequired,
+  hideFollowbackAlert: PropTypes.func.isRequired,
+  hideRevokefollowAlert: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -150,7 +242,11 @@ const mapStateToProps = (state) => ({
 
 const mapActionsToProps = {
   fetchProfile,
-  clearProfile
+  clearProfile,
+  hideFollowAlert,
+  hideUnfollowAlert,
+  hideFollowbackAlert,
+  hideRevokefollowAlert
 };
 
 export default connect(

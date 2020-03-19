@@ -20,7 +20,11 @@ import {
   handleUnfollow,
   handleFollowBack,
   handleRevokeFollowBack,
-  clearFollower
+  clearFollower,
+  hideFollowAlert,
+  hideUnfollowAlert,
+  hideFollowbackAlert,
+  hideRevokefollowAlert
 } from '../../redux/actions/userActions';
 
 
@@ -155,16 +159,29 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+
 const Header = (props) => {
 
   const {
     user, followId, followedId, followedBack,
     findFollower, findFollowed, handleFollow,
     handleUnfollow, handleFollowBack,
-    handleRevokeFollowBack, clearFollower
+    handleRevokeFollowBack, clearFollower,
+    showFollowAlert, showUnfollowAlert, showFollowbackAlert, showRevokefollowAlert,
+    hideFollowAlert, hideUnfollowAlert, hideFollowbackAlert, hideRevokefollowAlert,
+    openFollowAlert, openUnfollowAlert, openFollowbackAlert, openRevokefollowAlert
   } = props;
   const classes = useStyles();
 
+
+  useEffect(() => {
+    window.onpopstate = () => {
+      hideFollowAlert();
+      hideUnfollowAlert();
+      hideFollowbackAlert();
+      hideRevokefollowAlert();
+    };
+  }, [hideFollowAlert, hideUnfollowAlert, hideFollowbackAlert, hideRevokefollowAlert]);
   
   useEffect(() => {
     clearFollower();
@@ -176,6 +193,30 @@ const Header = (props) => {
   }, [findFollower, findFollowed, user.handle]);
 
   useEffect(() => {
+    if(showFollowAlert === true){
+      openFollowAlert();
+    }
+  }, [showFollowAlert, openFollowAlert]);
+
+  useEffect(() => {
+    if(showUnfollowAlert === true){
+      openUnfollowAlert();
+    }
+  }, [showUnfollowAlert, openUnfollowAlert]);
+
+  useEffect(() => {
+    if(showFollowbackAlert === true){
+      openFollowbackAlert();
+    }
+  }, [showFollowbackAlert, openFollowbackAlert]);
+
+  useEffect(() => {
+    if(showRevokefollowAlert === true){
+      openRevokefollowAlert();
+    }
+  }, [showRevokefollowAlert, openRevokefollowAlert]);
+
+  /* useEffect(() => {
     console.log('followId', followId);
   }, [followId]);
 
@@ -185,8 +226,7 @@ const Header = (props) => {
 
   useEffect(() => {
     console.log('followedBack', followedBack);
-  }, [followedBack]);
-
+  }, [followedBack]); */
   
 
   const handleImageChange = (event) => {
@@ -199,6 +239,7 @@ const Header = (props) => {
     const fileInput = document.getElementById('imageInput');
     fileInput.click();
   };
+
 
   const buttonFollow = (
     <Button
@@ -378,13 +419,21 @@ Header.propTypes = {
   followId: PropTypes.string,
   followedId: PropTypes.string,
   followedBack: PropTypes.bool.isRequired,
-  clearFollower: PropTypes.func.isRequired
+  clearFollower: PropTypes.func.isRequired,
+  hideFollowAlert: PropTypes.func.isRequired,
+  hideUnfollowAlert: PropTypes.func.isRequired,
+  hideFollowbackAlert: PropTypes.func.isRequired,
+  hideRevokefollowAlert: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) => ({
   followId: state.user.followId,
   followedId: state.user.followedId,
-  followedBack: state.user.followedBack
+  followedBack: state.user.followedBack,
+  showFollowAlert: state.user.showFollowAlert,
+  showUnfollowAlert: state.user.showUnfollowAlert,
+  showFollowbackAlert: state.user.showFollowbackAlert,
+  showRevokefollowAlert: state.user.showRevokefollowAlert
 });
 
 const mapActionsToProps = {
@@ -394,7 +443,11 @@ const mapActionsToProps = {
   handleUnfollow,
   handleFollowBack,
   handleRevokeFollowBack,
-  clearFollower
+  clearFollower,
+  hideFollowAlert,
+  hideUnfollowAlert,
+  hideFollowbackAlert,
+  hideRevokefollowAlert
 };
 
 export default connect(

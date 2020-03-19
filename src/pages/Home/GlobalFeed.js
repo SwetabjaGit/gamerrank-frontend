@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import PropTypes from 'prop-types';
 
@@ -9,7 +9,6 @@ import Paginate from '../../components/Paginate';
 
 // Redux Stuff
 import { connect } from 'react-redux';
-
 
 
 const useStyles = makeStyles(() => ({
@@ -30,9 +29,9 @@ const GlobalFeed = (props) => {
   const itemsPerPage = 4;
 
 
-  useEffect(() => {
+  /* useEffect(() => {
     console.log(articles);
-  }, [articles])
+  }, [articles]); */
 
 
   const articlesList = loading ? (
@@ -63,7 +62,6 @@ const GlobalFeed = (props) => {
 };
 
 GlobalFeed.propTypes = {
-  fetchArticles: PropTypes.func.isRequired,
   authenticated: PropTypes.bool.isRequired,
   articles: PropTypes.array.isRequired,
   loading: PropTypes.bool.isRequired

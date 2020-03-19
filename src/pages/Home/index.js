@@ -63,14 +63,14 @@ const useStyles = makeStyles((theme) => ({
 
 const Home = (props) => {
 
-  const { match, history, authenticated, fetchArticles } = props;
+  const { match, history, authenticated, fetchArticles, articles } = props;
   const classes = useStyles();
   const { tab } = match.params;
 
 
   useEffect(() => {
-    fetchArticles();
-  }, [fetchArticles]);
+    (articles.length === 0) && fetchArticles();
+  }, [fetchArticles, articles]);
 
 
   const handleTabsChange = (event, value) => {
@@ -138,11 +138,13 @@ Home.propTypes = {
   match: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
   location: PropTypes.object.isRequired,
-  authenticated: PropTypes.bool.isRequired
+  authenticated: PropTypes.bool.isRequired,
+  articles: PropTypes.array.isRequired
 };
 
 const mapStateToProps = (state) => ({
   authenticated: state.user.authenticated,
+  articles: state.data.articles
 });
 
 const mapActionsToProps = {

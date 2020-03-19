@@ -13,10 +13,19 @@ import {
   UNFOLLOW_USER,
   FOLLOW_BACK,
   REVOKE_FOLLOW_BACK,
-  CLEAR_FOLLOWER
+  CLEAR_FOLLOWER,
+  SHOW_FOLLOW_ALERT,
+  HIDE_FOLLOW_ALERT,
+  SHOW_UNFOLLOW_ALERT,
+  HIDE_UNFOLLOW_ALERT,
+  SHOW_FOLLOWBACK_ALERT,
+  HIDE_FOLLOWBACK_ALERT,
+  SHOW_REVOKEFOLLOW_ALERT,
+  HIDE_REVOKEFOLLOW_ALERT
 } from '../types';
 import axios from 'axios';
 import axios2 from '../../utils/axios';
+
 
 
 export const loginUser = (userData, history) => (dispatch) => {
@@ -78,51 +87,69 @@ export const logoutUser = () => (dispatch) => {
 
 
 export const getUserData = () => (dispatch) => {
-  dispatch({ type: LOADING_USER });
-  axios.get('/user')
-    .then(res => {
-      dispatch({
-        type: SET_USER,
-        payload: res.data
+  return new Promise((resolve, reject) => {
+    dispatch({ type: LOADING_USER });
+    axios.get('/user')
+      .then(res => {
+        dispatch({
+          type: SET_USER,
+          payload: res.data
+        });
+        dispatch(clearErrors());
+      })
+      .then(response => {
+        resolve(response);
+      })
+      .catch(err => {
+        reject(err);
+        console.error(err);
+        dispatch(setErrors(err));
       });
-      dispatch(clearErrors());
-    })
-    .catch(err => {
-      console.error(err);
-      dispatch(setErrors(err));
-    });
+  });
 };
 
 
 export const findFollower = (userHandle) => (dispatch) => {
-  axios.get(`/findfollower/${userHandle}`)
-    .then((res) => {
-      dispatch({
-        type: FIND_FOLLOWER,
-        payload: res.data
+  return new Promise((resolve, reject) => {
+    axios.get(`/findfollower/${userHandle}`)
+      .then((res) => {
+        dispatch({
+          type: FIND_FOLLOWER,
+          payload: res.data
+        });
+        dispatch(clearErrors());
+      })
+      .then(response => {
+        resolve(response);
+      })
+      .catch(err => {
+        reject(err);
+        console.error(err);
+        dispatch(setErrors(err));
       });
-      dispatch(clearErrors());
-    })
-    .catch(err => {
-      console.error(err);
-      dispatch(setErrors(err));
-    });
+  });
 };
 
 
 export const findFollowed = (userHandle) => (dispatch) => {
-  axios.get(`/findfollowed/${userHandle}`)
-    .then((res) => {
-      dispatch({
-        type: FIND_FOLLOWED,
-        payload: res.data
+  return new Promise((resolve, reject) => {
+    axios.get(`/findfollowed/${userHandle}`)
+      .then((res) => {
+        dispatch({
+          type: FIND_FOLLOWED,
+          payload: res.data
+        });
+        dispatch(clearErrors());
+      })
+      .then(response => {
+        resolve(response);
+      })
+      .catch(err => {
+        reject(err);
+        console.error(err);
+        dispatch(setErrors(err));
       });
-      dispatch(clearErrors());
-    })
-    .catch(err => {
-      console.error(err);
-      dispatch(setErrors(err));
-    });
+  });
 };
 
 
@@ -135,12 +162,18 @@ export const handleFollow = (userHandle) => (dispatch) => {
         type: FOLLOW_USER,
         payload: res.data
       });
+      dispatch({ type: SHOW_FOLLOW_ALERT });
       dispatch(clearErrors());
     })
     .catch(err => {
       console.error(err);
       dispatch(setErrors(err));
     });
+};
+
+
+export const hideFollowAlert = () => (dispatch) => {
+  dispatch({ type: HIDE_FOLLOW_ALERT });
 };
 
 
@@ -150,12 +183,18 @@ export const handleUnfollow = (followId, userHandle) => (dispatch) => {
     .then((res) => {
       console.log(`${userHandle} unfollowed`);
       dispatch({ type: UNFOLLOW_USER });
+      dispatch({ type: SHOW_UNFOLLOW_ALERT });
       dispatch(clearErrors());
     })
     .catch(err => {
       console.error(err);
       dispatch(setErrors(err));
     });
+};
+
+
+export const hideUnfollowAlert = () => (dispatch) => {
+  dispatch({ type: HIDE_UNFOLLOW_ALERT });
 };
 
 
@@ -165,6 +204,7 @@ export const handleFollowBack = (followedId, userHandle) => (dispatch) => {
     .then((res) => {
       console.log(`${userHandle} followed back`);
       dispatch({ type: FOLLOW_BACK });
+      dispatch({ type: SHOW_FOLLOWBACK_ALERT });
       dispatch(clearErrors());
     })
     .catch(err => {
@@ -174,18 +214,29 @@ export const handleFollowBack = (followedId, userHandle) => (dispatch) => {
 };
 
 
+export const hideFollowbackAlert = () => (dispatch) => {
+  dispatch({ type: HIDE_FOLLOWBACK_ALERT });
+};
+
+
 export const handleRevokeFollowBack = (followedId, userHandle) => (dispatch) => {
   console.log('RevokeFollowBack Called');
   axios.post(`/user/${followedId}/revokeFollowBack`)
     .then((res) => {
       console.log(`${userHandle} Unfollowed`);
       dispatch({ type: REVOKE_FOLLOW_BACK });
+      dispatch({ type: SHOW_REVOKEFOLLOW_ALERT });
       dispatch(clearErrors());
     })
     .catch(err => {
       console.error(err);
       dispatch(setErrors(err));
     });
+};
+
+
+export const hideRevokefollowAlert = () => (dispatch) => {
+  dispatch({ type: HIDE_REVOKEFOLLOW_ALERT });
 };
 
 
