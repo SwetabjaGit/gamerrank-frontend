@@ -87,69 +87,51 @@ export const logoutUser = () => (dispatch) => {
 
 
 export const getUserData = () => (dispatch) => {
-  return new Promise((resolve, reject) => {
-    dispatch({ type: LOADING_USER });
-    axios.get('/user')
-      .then(res => {
-        dispatch({
-          type: SET_USER,
-          payload: res.data
-        });
-        dispatch(clearErrors());
-      })
-      .then(response => {
-        resolve(response);
-      })
-      .catch(err => {
-        reject(err);
-        console.error(err);
-        dispatch(setErrors(err));
+  dispatch({ type: LOADING_USER });
+  axios.get('/user')
+    .then(res => {
+      dispatch({
+        type: SET_USER,
+        payload: res.data
       });
-  });
+      dispatch(clearErrors());
+    })
+    .catch(err => {
+      console.error(err);
+      dispatch(setErrors(err));
+    });
 };
 
 
 export const findFollower = (userHandle) => (dispatch) => {
-  return new Promise((resolve, reject) => {
-    axios.get(`/findfollower/${userHandle}`)
-      .then((res) => {
-        dispatch({
-          type: FIND_FOLLOWER,
-          payload: res.data
-        });
-        dispatch(clearErrors());
-      })
-      .then(response => {
-        resolve(response);
-      })
-      .catch(err => {
-        reject(err);
-        console.error(err);
-        dispatch(setErrors(err));
+  axios.get(`/findfollower/${userHandle}`)
+    .then((res) => {
+      dispatch({
+        type: FIND_FOLLOWER,
+        payload: res.data
       });
-  });
+      dispatch(clearErrors());
+    })
+    .catch(err => {
+      console.error(err);
+      dispatch(setErrors(err));
+    });
 };
 
 
 export const findFollowed = (userHandle) => (dispatch) => {
-  return new Promise((resolve, reject) => {
-    axios.get(`/findfollowed/${userHandle}`)
-      .then((res) => {
-        dispatch({
-          type: FIND_FOLLOWED,
-          payload: res.data
-        });
-        dispatch(clearErrors());
-      })
-      .then(response => {
-        resolve(response);
-      })
-      .catch(err => {
-        reject(err);
-        console.error(err);
-        dispatch(setErrors(err));
+  axios.get(`/findfollowed/${userHandle}`)
+    .then((res) => {
+      dispatch({
+        type: FIND_FOLLOWED,
+        payload: res.data
       });
-  });
+      dispatch(clearErrors());
+    })
+    .catch(err => {
+      console.error(err);
+      dispatch(setErrors(err));
+    });
 };
 
 
@@ -182,7 +164,9 @@ export const handleUnfollow = (followId, userHandle) => (dispatch) => {
   axios.delete(`/user/${followId}/unfollow`)
     .then((res) => {
       console.log(`${userHandle} unfollowed`);
-      dispatch({ type: UNFOLLOW_USER });
+      dispatch({ 
+        type: UNFOLLOW_USER
+      });
       dispatch({ type: SHOW_UNFOLLOW_ALERT });
       dispatch(clearErrors());
     })
@@ -203,7 +187,9 @@ export const handleFollowBack = (followedId, userHandle) => (dispatch) => {
   axios.post(`/user/${followedId}/followBack`)
     .then((res) => {
       console.log(`${userHandle} followed back`);
-      dispatch({ type: FOLLOW_BACK });
+      dispatch({ 
+        type: FOLLOW_BACK
+      });
       dispatch({ type: SHOW_FOLLOWBACK_ALERT });
       dispatch(clearErrors());
     })
@@ -224,7 +210,9 @@ export const handleRevokeFollowBack = (followedId, userHandle) => (dispatch) => 
   axios.post(`/user/${followedId}/revokeFollowBack`)
     .then((res) => {
       console.log(`${userHandle} Unfollowed`);
-      dispatch({ type: REVOKE_FOLLOW_BACK });
+      dispatch({ 
+        type: REVOKE_FOLLOW_BACK
+      });
       dispatch({ type: SHOW_REVOKEFOLLOW_ALERT });
       dispatch(clearErrors());
     })

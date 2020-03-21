@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import blueGrey from '@material-ui/core/colors/blueGrey';
 import Typography from '@material-ui/core/Typography';
@@ -14,8 +14,6 @@ import Grid from '@material-ui/core/Grid';
 // Redux Stuff
 import { connect } from 'react-redux';
 import { 
-  findFollower,
-  findFollowed,
   handleFollow,
   handleUnfollow,
   handleFollowBack,
@@ -163,15 +161,18 @@ const useStyles = makeStyles(theme => ({
 const Header = (props) => {
 
   const {
-    user, followId, followedId, followedBack,
-    findFollower, findFollowed, handleFollow,
-    handleUnfollow, handleFollowBack,
+    user, authUser, followers, follower: { followId, followedId },
+    followAlert: { showFollowAlert, showUnfollowAlert, showFollowbackAlert, showRevokefollowAlert },
+    handleFollow, handleUnfollow, handleFollowBack,
     handleRevokeFollowBack, clearFollower,
-    showFollowAlert, showUnfollowAlert, showFollowbackAlert, showRevokefollowAlert,
     hideFollowAlert, hideUnfollowAlert, hideFollowbackAlert, hideRevokefollowAlert,
     openFollowAlert, openUnfollowAlert, openFollowbackAlert, openRevokefollowAlert
   } = props;
   const classes = useStyles();
+  
+  const [isFollower, setisFollower] = useState('');
+  const [isFollowed, setisFollowed] = useState('');
+  const [followedBack, setFollowedBack] = useState(false);
 
 
   useEffect(() => {
@@ -184,13 +185,21 @@ const Header = (props) => {
   }, [hideFollowAlert, hideUnfollowAlert, hideFollowbackAlert, hideRevokefollowAlert]);
   
   useEffect(() => {
-    clearFollower();
+    window.onpopstate = () => {
+      clearFollower();
+    }
   }, [clearFollower]);
 
   useEffect(() => {
-    findFollower(user.handle);
-    findFollowed(user.handle);
-  }, [findFollower, findFollowed, user.handle]);
+    setisFollower(followers[authUser + '_' + user.handle]);
+    setisFollowed(followers[user.handle + '_' + authUser]);
+  }, [followers, authUser, user.handle]);
+
+  useEffect(() => {
+    if(isFollowed){
+      setFollowedBack(followers[user.handle + '_' + authUser].followBack);
+    }
+  }, [user.handle, authUser, followers, isFollowed]);
 
   useEffect(() => {
     if(showFollowAlert === true){
@@ -222,11 +231,13 @@ const Header = (props) => {
 
   useEffect(() => {
     console.log('followedId', followedId);
-  }, [followedId]);
+  }, [followedId]); */
 
-  useEffect(() => {
-    console.log('followedBack', followedBack);
-  }, [followedBack]); */
+  /* useEffect(() => {
+    console.log('followBack', followers[user.handle + '_' + authUser].followBack);
+    console.log('isFollowed', followers[user.handle + '_' + authUser]);
+  }, [followers, isFollowed, user.handle, authUser]); */
+  
   
 
   const handleImageChange = (event) => {
@@ -240,13 +251,43 @@ const Header = (props) => {
     fileInput.click();
   };
 
+  const followUser = () => {
+    setisFollower(authUser + '_' + user.handle);
+    setisFollowed(null);
+    followers[authUser + '_' + user.handle] = {
+      follower: authUser,
+      following: user.handle,
+      followBack: false
+    }
+    handleFollow(user.handle);
+  };
+
+  const unfollowUser = () => {
+    setisFollower(null);
+    setisFollowed(null);
+    delete followers[authUser + '_' + user.handle];
+    handleUnfollow(followId, user.handle);
+  };
+
+  const followBackUser = () => {
+    setFollowedBack(true);
+    followers[user.handle + '_' + authUser].followBack = true;
+    handleFollowBack(followedId, user.handle);
+  };
+
+  const revokeFollowBackUser = () => {
+    setFollowedBack(false);
+    followers[user.handle + '_' + authUser].followBack = false;
+    handleRevokeFollowBack(followedId, user.handle);
+  };
+
 
   const buttonFollow = (
     <Button
       variant="contained"
       color="primary"
       className={classes.buttonSolid}
-      onClick={() => handleFollow(user.handle)}
+      onClick={followUser}
     >
       Follow
     </Button>
@@ -257,7 +298,7 @@ const Header = (props) => {
       variant="outlined"
       color="primary" 
       className={classes.buttonOutlined}
-      onClick={() => handleUnfollow(followId, user.handle)}
+      onClick={unfollowUser}
     >
       Unfollow
     </Button>
@@ -268,7 +309,7 @@ const Header = (props) => {
       variant="contained"
       color="primary" 
       className={classes.buttonSolid}
-      onClick={() => handleFollowBack(followedId, user.handle)}
+      onClick={followBackUser}
     >
       Follow Back
     </Button>
@@ -279,7 +320,7 @@ const Header = (props) => {
       variant="outlined"
       color="primary" 
       className={classes.buttonOutlined}
-      onClick={() => handleRevokeFollowBack(followedId, user.handle)}
+      onClick={revokeFollowBackUser}
     >
       Revoke FollowBack
     </Button>
@@ -386,11 +427,11 @@ const Header = (props) => {
             <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
               <div className={classes.rowBox}>
                 {
-                  followId === null ? (
-                    followedId !== null ? (
+                  (user.handle !== authUser) ? (!isFollower ? (
+                    isFollowed ? (
                       followedBack === true ? buttonRevokeFollowBack : buttonFollowBack
                     ) : buttonFollow
-                  ) : buttonUnfollow
+                  ) : buttonUnfollow) : null
                 }
                 <Button
                   variant="outlined"
@@ -416,9 +457,9 @@ const Header = (props) => {
 
 Header.propTypes = {
   className: PropTypes.string,
-  followId: PropTypes.string,
-  followedId: PropTypes.string,
-  followedBack: PropTypes.bool.isRequired,
+  followers: PropTypes.object.isRequired,
+  follower: PropTypes.object.isRequired,
+  followAlert: PropTypes.object.isRequired,
   clearFollower: PropTypes.func.isRequired,
   hideFollowAlert: PropTypes.func.isRequired,
   hideUnfollowAlert: PropTypes.func.isRequired,
@@ -427,18 +468,12 @@ Header.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  followId: state.user.followId,
-  followedId: state.user.followedId,
-  followedBack: state.user.followedBack,
-  showFollowAlert: state.user.showFollowAlert,
-  showUnfollowAlert: state.user.showUnfollowAlert,
-  showFollowbackAlert: state.user.showFollowbackAlert,
-  showRevokefollowAlert: state.user.showRevokefollowAlert
+  followers: state.user.followers,
+  follower: state.data.follower,
+  followAlert: state.user.followAlert
 });
 
 const mapActionsToProps = {
-  findFollower,
-  findFollowed,
   handleFollow,
   handleUnfollow,
   handleFollowBack,

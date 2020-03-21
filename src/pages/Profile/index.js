@@ -59,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
 const Profile = (props) => {
 
   const { 
-    match, history, 
+    match, history, authUser,
     profile, fetchProfile, clearProfile,
     hideFollowAlert, hideUnfollowAlert,
     hideFollowbackAlert, hideRevokefollowAlert
@@ -72,21 +72,20 @@ const Profile = (props) => {
   const [openUBAlert, setOpenUBAlert] = useState(false);
 
 
+
+  useEffect(() => {
+    clearProfile();
+  }, [clearProfile]);
+
   useEffect(() => {
     fetchProfile(userHandle);
   }, [userHandle, fetchProfile]);
 
-  useEffect(() => {
-    window.onpopstate = () => {
-      clearProfile();
-    };
-  }, [clearProfile]);
 
 
   const handleTabsChange = (event, value) => {
     history.push(value);
   };
-
 
   const tabs = [];
   tabs.push({ value: 'myarticles', label: 'My Articles' });
@@ -150,7 +149,8 @@ const Profile = (props) => {
 
   const displayHeader = profile.user ? (
     <Header 
-      user={profile.user} 
+      user={profile.user}
+      authUser={authUser}
       openFollowAlert={handleFOpen}
       openUnfollowAlert={handleUOpen} 
       openFollowbackAlert={handleFBOpen}
@@ -228,16 +228,18 @@ Profile.propTypes = {
   loading: PropTypes.bool.isRequired,
   profile: PropTypes.object.isRequired,
   fetchProfile: PropTypes.func.isRequired,
-  clearProfile: PropTypes.func,
+  clearProfile: PropTypes.func.isRequired,
   hideFollowAlert: PropTypes.func.isRequired,
   hideUnfollowAlert: PropTypes.func.isRequired,
   hideFollowbackAlert: PropTypes.func.isRequired,
   hideRevokefollowAlert: PropTypes.func.isRequired,
+  authUser: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = (state) => ({
   profile: state.data.profile,
-  loading: state.UI.loading
+  loading: state.UI.loading,
+  authUser: state.user.credentials.handle,
 });
 
 const mapActionsToProps = {

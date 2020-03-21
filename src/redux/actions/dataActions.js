@@ -52,27 +52,22 @@ export const setArticles = (data) => (dispatch) => {
 
 
 export const fetchArticlesByTag = (tag) => (dispatch) => {
-  return new Promise((resolve, reject) => {
-    dispatch({ type: LOADING_UI });
-    dispatch({ type: LOADING_TAG_ARTICLE });
-    axios.get(`/screams/${tag}`)
-      .then(res => {
-        dispatch({
-          type: FILTER_BY_TAG,
-          payload: res.data
-        });
-        dispatch(clearErrors());
-        dispatch({ type: STOP_LOADING_TAG_ARTICLE });
-      })
-      .then(response => {
-        resolve(response);
-      })
-      .catch(err => {
-        console.error(err);
-        dispatch(setErrors(err));
-        dispatch({ type: STOP_LOADING_TAG_ARTICLE });
+  dispatch({ type: LOADING_UI });
+  dispatch({ type: LOADING_TAG_ARTICLE });
+  axios.get(`/screams/${tag}`)
+    .then(res => {
+      dispatch({
+        type: FILTER_BY_TAG,
+        payload: res.data
       });
-  });
+      dispatch(clearErrors());
+      dispatch({ type: STOP_LOADING_TAG_ARTICLE });
+    })
+    .catch(err => {
+      console.error(err);
+      dispatch(setErrors(err));
+      dispatch({ type: STOP_LOADING_TAG_ARTICLE });
+    });
 };
 
 
@@ -98,29 +93,23 @@ export const clearArticle = () => (dispatch) => {
 
 
 export const fetchProfile = (userHandle) => (dispatch) => {
-  return new Promise((resolve, reject) => {
-    dispatch({ type: LOADING_UI });
-    dispatch({ type: LOADING_PROFILE });
-    axios.get(`/user/${userHandle}`)
-      .then((res) => {
-        console.log('UserDetails', res.data);
-        dispatch({
-          type: SET_PROFILE,
-          payload: res.data
-        });
-        dispatch(clearErrors());
-        dispatch({ type: STOP_LOADING_PROFILE });
-      })
-      .then(response => {
-        resolve(response);
-      })
-      .catch((err) => {
-        reject(err);
-        console.error(err);
-        dispatch(setErrors(err));
-        dispatch({ type: STOP_LOADING_PROFILE });
+  dispatch({ type: LOADING_UI });
+  dispatch({ type: LOADING_PROFILE });
+  axios.get(`/user/${userHandle}`)
+    .then((res) => {
+      console.log('UserDetails', res.data);
+      dispatch({
+        type: SET_PROFILE,
+        payload: res.data
       });
-  });
+      dispatch(clearErrors());
+      dispatch({ type: STOP_LOADING_PROFILE });
+    })
+    .catch((err) => {
+      console.error(err);
+      dispatch(setErrors(err));
+      dispatch({ type: STOP_LOADING_PROFILE });
+    });
 };
 
 

@@ -14,7 +14,12 @@ import {
   STOP_LOADING_TRACKS,
   FILTER_BY_TAG,
   LOADING_TAG_ARTICLE,
-  STOP_LOADING_TAG_ARTICLE
+  STOP_LOADING_TAG_ARTICLE,
+  FOLLOW_USER,
+  UNFOLLOW_USER,
+  FOLLOW_BACK,
+  REVOKE_FOLLOW_BACK,
+  CLEAR_FOLLOWER,
 } from '../types';
 
 const initialState = {
@@ -22,6 +27,11 @@ const initialState = {
   tagArticles: [],
   article: {},
   profile: {},
+  follower: {
+    followId: null,
+    followedId: null,
+    followedBack: false,
+  },
   tracks: [],
   nextHref: null,
   hasMoreItems: true,
@@ -80,7 +90,8 @@ export default (state = initialState, action) => {
     case SET_PROFILE:
       return {
         ...state,
-        profile: action.payload
+        profile: action.payload,
+        follower: action.payload.follower
       };
     case CLEAR_PROFILE:
       return {
@@ -131,6 +142,49 @@ export default (state = initialState, action) => {
       return {
         ...state,
         loadingTracks: false
+      };
+    
+    
+    case FOLLOW_USER:
+      return {
+        ...state,
+        follower: {
+          ...state.follower,
+          followId: action.payload.followId
+        }
+      };
+    case UNFOLLOW_USER:
+      return {
+        ...state,
+        follower: {
+          ...state.follower,
+          followId: null
+        }
+      };
+    case FOLLOW_BACK:
+      return {
+        ...state,
+        follower: {
+          ...state.follower,
+          followedBack: true
+        }
+      };
+    case REVOKE_FOLLOW_BACK:
+      return {
+        ...state,
+        follower: {
+          ...state.follower,
+          followedBack: false
+        }
+      };
+    case CLEAR_FOLLOWER:
+      return {
+        ...state,
+        follower: {
+          followId: null,
+          followedId: null,
+          followedBack: false
+        }
       };
     default:
       return state;

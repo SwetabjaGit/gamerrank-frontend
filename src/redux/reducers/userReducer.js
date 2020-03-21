@@ -6,11 +6,6 @@ import {
   FETCH_NOTIFICATIONS,
   FIND_FOLLOWER,
   FIND_FOLLOWED,
-  FOLLOW_USER,
-  UNFOLLOW_USER,
-  FOLLOW_BACK,
-  REVOKE_FOLLOW_BACK,
-  CLEAR_FOLLOWER,
   SHOW_FOLLOW_ALERT,
   HIDE_FOLLOW_ALERT,
   SHOW_UNFOLLOW_ALERT,
@@ -18,7 +13,7 @@ import {
   SHOW_FOLLOWBACK_ALERT,
   HIDE_FOLLOWBACK_ALERT,
   SHOW_REVOKEFOLLOW_ALERT,
-  HIDE_REVOKEFOLLOW_ALERT
+  HIDE_REVOKEFOLLOW_ALERT,
 } from '../types';
 
 const initialState = {
@@ -26,15 +21,15 @@ const initialState = {
   loading: false,
   credentials: {},
   likes: [],
+  followers: {},
   notifications: [],
   notificationsDummy: [],
-  followId: null,
-  followedId: null,
-  followedBack: false,
-  showFollowAlert: false,
-  showUnfollowAlert: false,
-  showFollowbackAlert: false,
-  showRevokefollowAlert: false
+  followAlert: {
+    showFollowAlert: false,
+    showUnfollowAlert: false,
+    showFollowbackAlert: false,
+    showRevokefollowAlert: false
+  }
 };
 
 export default (state = initialState, action) => {
@@ -47,12 +42,18 @@ export default (state = initialState, action) => {
     case SET_UNAUTHENTICATED:
       return initialState;
     case SET_USER:
+      var result = action.payload.followers.reduce((map, obj) => {
+        let hashKey = obj.follower + '_' + obj.following;
+        map[hashKey] = obj;
+        return map;
+      }, {});
       return {
         ...state,
         authenticated: true,
         loading: false,
         credentials: action.payload.credentials,
         likes: action.payload.likes,
+        followers: result,
         notifications: action.payload.notifications
       };
     case LOADING_USER:
@@ -68,81 +69,84 @@ export default (state = initialState, action) => {
     case FIND_FOLLOWER:
       return {
         ...state,
-        followId: action.payload.followId,
-        followedBack: false
+        follower: {
+          ...state.follower,
+          followId: action.payload.followId,
+          followedBack: false
+        }
       };
     case FIND_FOLLOWED:
       return {
         ...state,
-        followedId: action.payload.followedId,
-        followedBack: action.payload.followedBack
-      };
-    case FOLLOW_USER:
-      return {
-        ...state,
-        followId: action.payload.followId
-      };
-    case UNFOLLOW_USER:
-      return {
-        ...state,
-        followId: null
-      };
-    case FOLLOW_BACK:
-      return {
-        ...state,
-        followedBack: true
-      };
-    case REVOKE_FOLLOW_BACK:
-      return {
-        ...state,
-        followedBack: false
-      };
-    case CLEAR_FOLLOWER:
-      return {
-        ...state,
-        followId: null,
-        followedId: null,
-        followedBack: false
+        follower: {
+          ...state.follower,
+          followedId: action.payload.followedId,
+          followedBack: action.payload.followedBack
+        }
       };
     case SHOW_FOLLOW_ALERT:
       return {
         ...state,
-        showFollowAlert: true
+        followAlert: {
+          ...state.followAlert,
+          showFollowAlert: true
+        }
       };
     case HIDE_FOLLOW_ALERT:
       return {
         ...state,
-        showFollowAlert: false
+        followAlert: {
+          ...state.followAlert,
+          showFollowAlert: false
+        }
       };
     case SHOW_UNFOLLOW_ALERT:
       return {
         ...state,
-        showUnfollowAlert: true
+        followAlert: {
+          ...state.followAlert,
+          showUnfollowAlert: true
+        }
       };
     case HIDE_UNFOLLOW_ALERT:
       return {
         ...state,
-        showUnfollowAlert: false
+        followAlert: {
+          ...state.followAlert,
+          showUnfollowAlert: false
+        }
       };
     case SHOW_FOLLOWBACK_ALERT:
       return {
         ...state,
-        showFollowbackAlert: true
+        followAlert: {
+          ...state.followAlert,
+          showFollowbackAlert: true
+        }
       };
     case HIDE_FOLLOWBACK_ALERT:
       return {
         ...state,
-        showFollowbackAlert: false
+        followAlert: {
+          ...state.followAlert,
+          showFollowbackAlert: false
+        }
       };
     case SHOW_REVOKEFOLLOW_ALERT:
       return {
         ...state,
-        showRevokefollowAlert: true
+        followAlert: {
+          ...state.followAlert,
+          showRevokefollowAlert: true
+        }
       };
     case HIDE_REVOKEFOLLOW_ALERT:
       return {
         ...state,
-        showRevokefollowAlert: false
+        followAlert: {
+          ...state.followAlert,
+          showRevokefollowAlert: false
+        }
       };
     default:
       return state;
