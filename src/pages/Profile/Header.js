@@ -31,7 +31,7 @@ const useStyles = makeStyles(theme => ({
   root: {
     boxShadow: 'none',
     flexGrow: 1,
-    marginTop: 13,
+    marginTop: 12,
     backgroundColor: '#388E3C',
   },
   inner: {
@@ -161,7 +161,7 @@ const useStyles = makeStyles(theme => ({
 const Header = (props) => {
 
   const {
-    user, authUser, followers, follower: { followId, followedId },
+    user, authenticated, authUser, followers, follower,
     followAlert: { showFollowAlert, showUnfollowAlert, showFollowbackAlert, showRevokefollowAlert },
     handleFollow, handleUnfollow, handleFollowBack,
     handleRevokeFollowBack, clearFollower,
@@ -191,15 +191,17 @@ const Header = (props) => {
   }, [clearFollower]);
 
   useEffect(() => {
-    setisFollower(followers[authUser + '_' + user.handle]);
-    setisFollowed(followers[user.handle + '_' + authUser]);
-  }, [followers, authUser, user.handle]);
+    if(authenticated){
+      setisFollower(followers[authUser + '_' + user.handle]);
+      setisFollowed(followers[user.handle + '_' + authUser]);
+    }
+  }, [authenticated, followers, authUser, user.handle]);
 
   useEffect(() => {
-    if(isFollowed){
+    if(authenticated && isFollowed){
       setFollowedBack(followers[user.handle + '_' + authUser].followBack);
     }
-  }, [user.handle, authUser, followers, isFollowed]);
+  }, [authenticated, user.handle, authUser, followers, isFollowed]);
 
   useEffect(() => {
     if(showFollowAlert === true){
@@ -226,12 +228,12 @@ const Header = (props) => {
   }, [showRevokefollowAlert, openRevokefollowAlert]);
 
   /* useEffect(() => {
-    console.log('followId', followId);
-  }, [followId]);
+    console.log('followId', follower.followId);
+  }, [follower.followId]);
 
   useEffect(() => {
-    console.log('followedId', followedId);
-  }, [followedId]); */
+    console.log('followedId', follower.followedId);
+  }, [follower.followedId]); */
 
   /* useEffect(() => {
     console.log('followBack', followers[user.handle + '_' + authUser].followBack);
@@ -266,19 +268,19 @@ const Header = (props) => {
     setisFollower(null);
     setisFollowed(null);
     delete followers[authUser + '_' + user.handle];
-    handleUnfollow(followId, user.handle);
+    handleUnfollow(follower.followId, user.handle);
   };
 
   const followBackUser = () => {
     setFollowedBack(true);
     followers[user.handle + '_' + authUser].followBack = true;
-    handleFollowBack(followedId, user.handle);
+    handleFollowBack(follower.followedId, user.handle);
   };
 
   const revokeFollowBackUser = () => {
     setFollowedBack(false);
     followers[user.handle + '_' + authUser].followBack = false;
-    handleRevokeFollowBack(followedId, user.handle);
+    handleRevokeFollowBack(follower.followedId, user.handle);
   };
 
 
@@ -427,11 +429,13 @@ const Header = (props) => {
             <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
               <div className={classes.rowBox}>
                 {
-                  (user.handle !== authUser) ? (!isFollower ? (
-                    isFollowed ? (
-                      followedBack === true ? buttonRevokeFollowBack : buttonFollowBack
-                    ) : buttonFollow
-                  ) : buttonUnfollow) : null
+                  authenticated && (
+                    (user.handle !== authUser) ? (!isFollower ? (
+                      isFollowed ? (
+                        followedBack === true ? buttonRevokeFollowBack : buttonFollowBack
+                      ) : buttonFollow
+                    ) : buttonUnfollow) : null
+                  )
                 }
                 <Button
                   variant="outlined"
@@ -458,7 +462,7 @@ const Header = (props) => {
 Header.propTypes = {
   className: PropTypes.string,
   followers: PropTypes.object.isRequired,
-  follower: PropTypes.object.isRequired,
+  follower: PropTypes.object,
   followAlert: PropTypes.object.isRequired,
   clearFollower: PropTypes.func.isRequired,
   hideFollowAlert: PropTypes.func.isRequired,

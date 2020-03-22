@@ -59,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
 const Profile = (props) => {
 
   const { 
-    match, history, authUser,
+    match, history, authenticated, authUser,
     profile, fetchProfile, clearProfile,
     hideFollowAlert, hideUnfollowAlert,
     hideFollowbackAlert, hideRevokefollowAlert
@@ -150,6 +150,7 @@ const Profile = (props) => {
   const displayHeader = profile.user ? (
     <Header 
       user={profile.user}
+      authenticated={authenticated}
       authUser={authUser}
       openFollowAlert={handleFOpen}
       openUnfollowAlert={handleUOpen} 
@@ -233,10 +234,11 @@ Profile.propTypes = {
   hideUnfollowAlert: PropTypes.func.isRequired,
   hideFollowbackAlert: PropTypes.func.isRequired,
   hideRevokefollowAlert: PropTypes.func.isRequired,
-  authUser: PropTypes.string.isRequired,
+  authUser: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({
+  authenticated: state.user.authenticated,
   profile: state.data.profile,
   loading: state.UI.loading,
   authUser: state.user.credentials.handle,
