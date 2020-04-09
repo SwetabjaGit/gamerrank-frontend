@@ -21,7 +21,10 @@ import {
   SHOW_FOLLOWBACK_ALERT,
   HIDE_FOLLOWBACK_ALERT,
   SHOW_REVOKEFOLLOW_ALERT,
-  HIDE_REVOKEFOLLOW_ALERT
+  HIDE_REVOKEFOLLOW_ALERT,
+  SET_USERS_FEED,
+  LOADING_FEED,
+  STOP_LOADING_FEED
 } from '../types';
 import axios from 'axios';
 import axios2 from '../../utils/axios';
@@ -61,6 +64,24 @@ export const signupUser = (newUserData, history) => (dispatch) => {
     });
 };
 
+export const fetchUsersFeed = () => (dispatch) => {
+  dispatch({ type: LOADING_UI });
+  dispatch({ type: LOADING_FEED });
+  axios.get('/user/feed')
+    .then((res) => {
+      dispatch({
+        type: SET_USERS_FEED,
+        payload: res.data
+      });
+      dispatch(clearErrors());
+      dispatch({ type: STOP_LOADING_FEED });
+    })
+    .catch(err => {
+      console.error(err);
+      dispatch(setErrors(err));
+      dispatch({ type: STOP_LOADING_FEED });
+    })
+};
 
 export const fetchNotifications = () => (dispatch) => {
   axios2.get('/api/account/notifications')
@@ -101,6 +122,20 @@ export const getUserData = () => (dispatch) => {
       dispatch(setErrors(err));
     });
 };
+
+
+export const uploadImage = (formData) => (dispatch) => {
+  dispatch({ type: LOADING_USER });
+  axios.post('/user/image', formData)
+    .then(() => {
+      dispatch(getUserData());
+    })
+    .catch(err => {
+      console.log(err);
+    });
+};
+
+
 
 
 export const findFollower = (userHandle) => (dispatch) => {
@@ -247,9 +282,10 @@ export const clearErrors = () => (dispatch) => {
 
 
 export const setErrors = (error) => (dispatch) => {
+  console.log(error);
   dispatch({
     type: SET_ERRORS,
-    payload: error.response.data
+    payload: error
   });
   dispatch({ type: STOP_LOADING_UI });
 };

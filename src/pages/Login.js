@@ -58,7 +58,7 @@ const Login = (props) => {
       ...userData,
       [event.target.name]: event.target.value
     });
-    console.log(userData);
+    //console.log(userData);
   };
 
   return (

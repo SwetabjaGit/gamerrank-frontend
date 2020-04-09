@@ -2,22 +2,23 @@ import { colors } from '@material-ui/core';
 
 const white = '#FFFFFF';
 const black = '#000000';
-const accentColor = '#42464a';
+const primary = '#42464a';
+const secondary = '#0080ff';
 
 export default {
   black,
   white,
   primary: {
     contrastText: white,
-    dark: accentColor,
-    main: accentColor,
-    light: accentColor
+    dark: primary,
+    main: primary,
+    light: primary
   },
   secondary: {
     contrastText: white,
-    dark: accentColor,
-    main: accentColor,
-    light: accentColor
+    dark: secondary,
+    main: secondary,
+    light: secondary
   },
   error: {
     contrastText: white,

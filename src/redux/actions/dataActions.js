@@ -18,7 +18,8 @@ import {
   STOP_LOADING_PROFILE,
   FILTER_BY_TAG,
   LOADING_TAG_ARTICLE,
-  STOP_LOADING_TAG_ARTICLE
+  STOP_LOADING_TAG_ARTICLE,
+  POST_ARTICLE
 } from '../types';
 import axios from 'axios';
 
@@ -92,6 +93,50 @@ export const clearArticle = () => (dispatch) => {
 };
 
 
+export const postArticle = (formData) => (dispatch) => {
+  dispatch({ type: LOADING_UI });
+  const localUrl = 'http://localhost:5000/socialape-d8699/us-central1/api/scream';
+  axios({
+    method: 'post',
+    url: localUrl,
+    data: formData,
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
+    .then((res) => {
+      console.log(res.data);
+      dispatch({
+        type: POST_ARTICLE,
+        payload: res.data
+      });
+      dispatch(clearErrors());
+    })
+    .catch((err) => {
+      console.error(err.data);
+      dispatch(setErrors(err));
+    });
+};
+
+
+export const uploadAndDisplay = (formData) => (dispatch) => {
+  dispatch({ type: LOADING_UI });
+  const localUrl = 'http://localhost:5000/socialape-d8699/us-central1/api/uploadAndDisplay';
+  axios({
+    method: 'post',
+    url: localUrl,
+    data: formData,
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
+  .then(res => {
+    console.log(res.data);
+    dispatch(clearErrors());
+  })
+  .catch(err => {
+    console.log(err);
+    dispatch(setErrors(err));
+  });
+};
+
+
 export const fetchProfile = (userHandle) => (dispatch) => {
   dispatch({ type: LOADING_UI });
   dispatch({ type: LOADING_PROFILE });
@@ -153,9 +198,10 @@ export const clearErrors = () => (dispatch) => {
 
 
 export const setErrors = (error) => (dispatch) => {
+  console.log(error);
   dispatch({
     type: SET_ERRORS,
-    payload: error.response.data
+    payload: error
   });
   dispatch({ type: STOP_LOADING_UI });
 };

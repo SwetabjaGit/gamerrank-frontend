@@ -6,12 +6,17 @@ import PropTypes from 'prop-types';
 import ScreamSkeleton from '../../utils/ScreamSkeleton';
 import ArticleItem from '../../components/ArticleItem';
 import Paginate from '../../components/Paginate';
+import AddArticle from '../../components/AddArticle';
 
 // Redux Stuff
 import { connect } from 'react-redux';
 
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
+  newArticle: {
+    marginTop: theme.spacing(4),
+    margin: theme.spacing(2),
+  },
   paginateBox: {
     minWidth: '100%',
     alignContent: 'center',
@@ -24,7 +29,7 @@ const useStyles = makeStyles(() => ({
 const GlobalFeed = (props) => {
   
   const classes = useStyles();
-  const { articles, loading } = props;
+  const { articles, loading, authenticated, currentUser, userImage } = props;
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 4;
 
@@ -48,6 +53,13 @@ const GlobalFeed = (props) => {
 
   return (
     <div>
+      { authenticated && (
+        <AddArticle 
+          className={classes.newArticle} 
+          currentUser={currentUser}
+          userImage={userImage}
+        />
+      )}
       {paginatedList}
       <div className={classes.paginateBox}>
         <Paginate
@@ -64,13 +76,17 @@ const GlobalFeed = (props) => {
 GlobalFeed.propTypes = {
   authenticated: PropTypes.bool.isRequired,
   articles: PropTypes.array.isRequired,
-  loading: PropTypes.bool.isRequired
+  loading: PropTypes.bool.isRequired,
+  currentUser: PropTypes.string,
+  userImage: PropTypes.string
 };
 
 const mapStateToProps = (state) => ({
   authenticated: state.user.authenticated,
   articles: state.data.articles,
-  loading: state.data.loading
+  loading: state.data.loading,
+  currentUser: state.user.credentials.handle,
+  userImage: state.user.credentials.imageUrl,
 });
 
 const mapActionsToProps = {

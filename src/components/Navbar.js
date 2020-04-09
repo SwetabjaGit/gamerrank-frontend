@@ -192,7 +192,6 @@ const Navbar = (props) => {
   const loggedInIconTray = ([
     homeIcon,
     tracksIcon,
-    newArticleIcon,
     settingsIcon,
     notifictionIcon,
     userProfile,

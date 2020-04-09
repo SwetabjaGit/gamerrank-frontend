@@ -14,11 +14,16 @@ import {
   HIDE_FOLLOWBACK_ALERT,
   SHOW_REVOKEFOLLOW_ALERT,
   HIDE_REVOKEFOLLOW_ALERT,
+  SET_USERS_FEED,
+  LOADING_FEED,
+  STOP_LOADING_FEED
 } from '../types';
 
 const initialState = {
   authenticated: false,
   loading: false,
+  loadingFeed: false,
+  feed: [],
   credentials: {},
   likes: [],
   followers: {},
@@ -41,6 +46,21 @@ export default (state = initialState, action) => {
       };
     case SET_UNAUTHENTICATED:
       return initialState;
+    case SET_USERS_FEED:
+      return {
+        ...state,
+        feed: action.payload
+      };
+    case LOADING_FEED:
+      return {
+        ...state,
+        loadingFeed: true
+      };
+    case STOP_LOADING_FEED:
+      return {
+        ...state,
+        loadingFeed: false
+      };
     case SET_USER:
       var result = action.payload.followers.reduce((map, obj) => {
         let hashKey = obj.follower + '_' + obj.following;

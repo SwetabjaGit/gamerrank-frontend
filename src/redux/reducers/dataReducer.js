@@ -20,6 +20,7 @@ import {
   FOLLOW_BACK,
   REVOKE_FOLLOW_BACK,
   CLEAR_FOLLOWER,
+  POST_ARTICLE
 } from '../types';
 
 const initialState = {
@@ -60,6 +61,14 @@ export default (state = initialState, action) => {
         ...state,
         loading: false,
         loadingArticles: false
+      };
+    case POST_ARTICLE:
+      return {
+        ...state,
+        articles: [
+          ...state.articles,
+          action.payload
+        ]
       };
     case FILTER_BY_TAG:
       return {
