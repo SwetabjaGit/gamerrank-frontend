@@ -1,170 +1,180 @@
-import React, { Component } from 'react';
-import withStyles from '@material-ui/core/styles/withStyles';
+import React, { useState, useEffect } from 'react';
+import { makeStyles } from '@material-ui/styles';
 import PropTypes from 'prop-types';
 import AppIcon from '../images/icon.png';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
+import clsx from 'clsx';
 
 //MUI Stuff
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import TextField from '@material-ui/core/TextField';
-import { Button } from '@material-ui/core';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import theme from '../utils/AuthTheme';
+import {
+  Button,
+  Typography,
+  TextField,
+  CircularProgress,
+  Card,
+  CardContent,
+  CardActions,
+  Divider,
+} from '@material-ui/core';
+import AuthTheme from '../utils/AuthTheme';
+
+// Redux Stuff
+import { connect } from 'react-redux';
+import { signupUser } from '../redux/actions/user';
 
 
-const styles = theme.AuthTheme;
 
-class Signup extends Component {
+const useStyles = makeStyles(AuthTheme);
 
-    constructor() {
-        super();
-        this.state = {
-            email: '',
-            password: '',
-            confirmPassword: '',
-            handle: '',
-            loading: false,
-            errors: {}
-        };
+const Signup = (props) => {
+  
+  const { history, className, UI: { loading } } = props;
+  const classes = useStyles();
+
+  const INITIAL_USER_STATE = { email: '', password: '', confirmPassword: '', handle: '' };
+  const [newUserData, setnewUserData] = useState(INITIAL_USER_STATE);
+  const [errors, setErrors] = useState({});
+  
+
+
+  useEffect(() => {
+    if(props.UI.errors){
+      setErrors(props.UI.errors)
     }
+  }, [props.UI.errors]);
 
-    handleSubmit = event => {
-        event.preventDefault();
-        this.setState({
-            loading: true
-        });
-        const newUserData = {
-            email: this.state.email,
-            password: this.state.password,
-            confirmPassword: this.state.confirmPassword,
-            handle: this.state.handle 
-        }
-        axios.post('/signup', newUserData)
-            .then(res => {
-                console.log(res.data);
-                //Store the token in browser localstorage so that we can use it later
-                localStorage.setItem('FBIdToken', `Bearer ${res.data.token}`);
-                this.setState({
-                    loading: false
-                }); 
-                this.props.history.push('/');
-            })
-            .catch(err => {
-                console.log(err.data);
-                this.setState({
-                    errors: err.response.data,
-                    loading: false
-                });
-            });
-    };
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    setnewUserData({
+      email: newUserData.email,
+      password: newUserData.password,
+      confirmPassword: newUserData.confirmPassword,
+      handle: newUserData.handle
+    });
+    console.log(newUserData);
+    props.signupUser(newUserData, history);
+  };
 
-    handleChange = (event) => {
-        this.setState({
-            [event.target.name]: event.target.value
-        });
-    };
+  const handleChange = (event) => {
+    setnewUserData({
+      ...newUserData,
+      [event.target.name]: event.target.value
+    });
+    console.log(newUserData);
+  };
 
-    render() {
-        const { classes } = this.props;
-        const { errors, loading } = this.state;
-
-        return (
-            <Grid container className={ classes.form }>
-                <Grid item sm />
-                <Grid item sm >
-                    <img src={AppIcon} alt="monkey" className={classes.image} />
-                    <Typography variant="h2" className={classes.pageTitle}>
-                        Signup
-                    </Typography>
-                    <form noValidate onSubmit={ this.handleSubmit }>
-                        <TextField
-                            id="email"
-                            name="email"
-                            type="email"
-                            label="Email"
-                            autoComplete="email"
-                            margin="normal"
-                            className={classes.textField}
-                            helperText={errors.email}
-                            error={errors.email ? true : false}
-                            value={this.state.email}
-                            onChange={this.handleChange}
-                            fullWidth
-                        />
-                        <TextField
-                            id="password"
-                            name="password"
-                            type="password"
-                            label="Password"
-                            autoComplete="current-password"
-                            margin="normal"
-                            className={classes.textField}
-                            helperText={errors.password}
-                            error={errors.password ? true : false}
-                            value={this.state.password}
-                            onChange={this.handleChange}
-                            fullWidth
-                        />
-                        <TextField
-                            id="confirmPassword"
-                            name="confirmPassword"
-                            type="password"
-                            label="Confirm Password"
-                            autoComplete="current-password"
-                            margin="normal"
-                            className={classes.textField}
-                            helperText={errors.confirmPassword}
-                            error={errors.confirmPassword ? true : false}
-                            value={this.state.confirmPassword}
-                            onChange={this.handleChange}
-                            fullWidth
-                        />
-                        <TextField
-                            id="handle"
-                            name="handle"
-                            type="text"
-                            label="Handle"
-                            autoComplete="current-password"
-                            margin="normal"
-                            className={classes.textField}
-                            helperText={errors.handle}
-                            error={errors.handle ? true : false}
-                            value={this.state.handle}
-                            onChange={this.handleChange}
-                            fullWidth
-                        />
-                        {errors.general && (
-                            <Typography variant="body2" className={classes.customError}>
-                                {errors.general}
-                            </Typography>
-                        )}
-                        <Button
-                            id="sbchjds"
-                            type="submit"
-                            variant="contained"
-                            color="primary"
-                            className={classes.button} >
-                            Signup
-                        </Button>
-                        <br />
-                        <small >
-                            Already have an account ? Login
-                            <Link to="/login"> here</Link>
-                        </small>
-                        <br />
-                        { loading ? <CircularProgress className={classes.progress} color="secondary" /> : <span></span> }
-                    </form>
-                </Grid>
-                <Grid item sm></Grid>
-            </Grid>
-        );
-    }
-}
+  return (
+    <Card
+      className={clsx(classes.root, className)}
+    >
+      <form noValidate onSubmit={ handleSubmit }>
+        <Typography variant="h2" className={classes.pageTitle}>
+          Sign Up
+        </Typography>
+        <Divider />
+        <CardContent className={classes.cardContent}>
+          <img src={AppIcon} alt="monkey" className={classes.image} />
+          <TextField
+            id="email"
+            name="email"
+            type="email"
+            label="Email"
+            autoComplete="email"
+            margin="normal"
+            className={classes.textField}
+            helperText={errors.email}
+            error={errors.email ? true : false}
+            value={newUserData.email}
+            onChange={handleChange}
+            variant="outlined"
+          />
+          <TextField
+            id="password"
+            name="password"
+            type="password"
+            label="Password"
+            autoComplete="current-password"
+            margin="normal"
+            className={classes.textField}
+            helperText={errors.password}
+            error={errors.password ? true : false}
+            value={newUserData.password}
+            onChange={handleChange}
+            variant="outlined"
+          />
+          <TextField
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            label="Confirm Password"
+            autoComplete="current-password"
+            margin="normal"
+            className={classes.textField}
+            helperText={errors.confirmPassword}
+            error={errors.confirmPassword ? true : false}
+            value={newUserData.confirmPassword}
+            onChange={handleChange}
+            variant="outlined"
+          />
+          <TextField
+            id="handle"
+            name="handle"
+            type="text"
+            label="Handle"
+            autoComplete="current-password"
+            margin="normal"
+            className={classes.textField}
+            helperText={errors.handle}
+            error={errors.handle ? true : false}
+            value={newUserData.handle}
+            onChange={handleChange}
+            variant="outlined"
+          />
+          {errors.general && (
+            <Typography variant="body2" className={classes.customError}>
+              {errors.general}
+            </Typography>
+          )}
+          <br />
+        </CardContent>
+        <Divider />
+        <CardActions className={classes.cardActions}>
+          <Button
+            id="submit-login"
+            type="submit"
+            className={classes.saveButton}
+            variant="contained"
+            size="large"
+          >
+            Signup
+          </Button>
+          <small >
+            Already have an account ? Login
+            <Link to="/login"> here</Link>
+          </small>
+          <br />
+          { loading ? <CircularProgress className={classes.progress} color="secondary" /> : <span></span> }
+        </CardActions>
+      </form>
+    </Card>
+  )
+};
 
 Signup.propTypes = {
-    classes: PropTypes.object.isRequired
-}
+  history: PropTypes.object,
+  className: PropTypes.string
+};
 
-export default withStyles(styles)(Signup);
+const mapStateToProps = (state) => ({
+  user: state.user,
+  UI: state.UI
+});
+
+const mapActionsToProps = {
+  signupUser,
+};
+
+export default connect(
+  mapStateToProps,
+  mapActionsToProps
+)(Signup);

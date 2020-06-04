@@ -1,36 +1,59 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
+
+//Components
+import ScreamSkeleton from '../../utils/ScreamSkeleton';
 import ArticleItem from '../../components/ArticleItem';
 
+// Redux Stuff
+import { connect } from 'react-redux';
+import { fetchUsersFeed } from '../../redux/actions/user';
 
-const YourFeed = () => {
 
-  const [notifications, setNotifications] = useState(null);
+const TagFilter = (props) => {
 
-  const fetchNotifications = () => {
-    axios.get('/notifications')
-      .then(res => {
-        console.log(res.data);
-        setNotifications(res.data);
-      })
-      .catch(err => {
-        console.error(err);
-      });
-  };
+  const { feedArticles, loadingFeed, fetchUsersFeed } = props;
+
 
   useEffect(() => {
-    fetchNotifications();
-  }, []);
+    fetchUsersFeed();
+  }, [fetchUsersFeed]);
 
-  /* const notificationsList = notifications ? (
-    notifications.map(notification => <ArticleItem key={notification.nId} notification={notification} ></ArticleItem>)
-  ) : <p>Loading...</p> */
+  useEffect(() => {
+    console.log(feedArticles);
+  }, [feedArticles]);
+
+
+  const articlesList = loadingFeed ? (
+    <ScreamSkeleton />
+  ) : (
+    feedArticles.map(scream => <ArticleItem key={scream.screamId} scream={scream}></ArticleItem>)
+  );
 
   return (
     <div>
-      <h1>This will be rendered soon.</h1>
+      { articlesList }
     </div>
   );
 };
 
-export default YourFeed;
+
+TagFilter.propTypes = {
+  feedArticles: PropTypes.array.isRequired,
+  loadingFeed: PropTypes.bool.isRequired,
+  fetchUsersFeed: PropTypes.func.isRequired
+};
+
+const mapStateToProps = (state) => ({
+  feedArticles: state.user.feed,
+  loadingFeed: state.user.loadingFeed
+});
+
+const mapActionsToProps = {
+  fetchUsersFeed
+};
+
+export default connect(
+  mapStateToProps,
+  mapActionsToProps
+)(TagFilter);

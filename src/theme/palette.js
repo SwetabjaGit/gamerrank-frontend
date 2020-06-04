@@ -2,21 +2,28 @@ import { colors } from '@material-ui/core';
 
 const white = '#FFFFFF';
 const black = '#000000';
+const primary = '#16AC59';
+const secondary = '#E69C1C';
+const tertiary = '#794BC4';
+const fourthColor = '#1991DA';
+const fifthColor = '#CA2056';
+const sixthColor = '#DC5520';
+
 
 export default {
   black,
   white,
   primary: {
     contrastText: white,
-    dark: '#FCBA03',
-    main: '#FCBA03',
-    light: '#FCBA03'
+    dark: primary,
+    main: primary,
+    light: primary
   },
   secondary: {
     contrastText: white,
-    dark: '#FCBA03',
-    main: '#FCBA03',
-    light: '#FCBA03'
+    dark: secondary,
+    main: secondary,
+    light: secondary
   },
   error: {
     contrastText: white,

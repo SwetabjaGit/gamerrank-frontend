@@ -1,89 +1,63 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { Router } from 'react-router-dom';
+import { renderRoutes } from 'react-router-config';
 import { createBrowserHistory } from 'history';
-import { ThemeProvider } from '@material-ui/styles';
-import { makeStyles } from '@material-ui/styles';
+import ThemeProvider from '@material-ui/styles/ThemeProvider';
 import jwtDecode from 'jwt-decode';
 import axios from 'axios';
 
-// Components
+// Utils
+import ScrollReset from './components/ScrollReset';
+import { SCREAMS_URL } from './config/constants';
 import theme from './theme';
-import LoggedOutNavbar from './components/LoggedOutNavbar';
-import Navbar from './components/Navbar';
-import Signup from './pages/Signup';
-import Login from './pages/Login';
-import Home from './pages/Home';
-import Article from './pages/Article';
-import Editor from './pages/Editor';
-import Profile from './pages/Profile';
-import ProfileFavorites from './pages/ProfileFavorites';
-import Settings from './pages/Settings';
-import SwitchRoute from './utils/SwitchRoute';
-import './utils/accountMock';
+import store from './redux/store';
+import routes from './routes';
+import './utils/mock/accountMock';
+import './utils/mock/chatMock';
+import './utils/mock/articlesMock';
+import './utils/mock/socialFeedMock';
+import './css/App.scss';
+
+// Redux Stuff
+import { Provider } from 'react-redux';
+import { SET_AUTHENTICATED } from './redux/types';
+import { logoutUser, getUserData } from './redux/actions/user';
 
 
-const useStyles = makeStyles(() => ({
-  root: {
-    height: '100%',
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    overflow: 'hidden'
-  },
-  container: {
-    height: '100%',
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    overflow: 'hidden',
-    marginTop: 60
-  }
-}));
-
-let authenticated = true;
 const history = createBrowserHistory();
-axios.defaults.baseURL = 'https://us-central1-socialape-d8699.cloudfunctions.net/api';
+axios.defaults.baseURL = SCREAMS_URL;
 
+
+const token = localStorage.FBIdToken;
+if (token) {
+  const decodedToken = jwtDecode(token);
+  let authenticated;
+  console.log(decodedToken);
+  if(decodedToken.exp * 1000 < Date.now()){
+    store.dispatch(logoutUser());
+    window.location.href = '/login';
+  } else {
+    store.dispatch({ type: SET_AUTHENTICATED })
+    axios.defaults.headers.common['Authorization'] = token;
+    store.dispatch(getUserData());
+    authenticated = store.getState().user.authenticated;
+  }
+  console.log('authenticated', authenticated);
+};
 
 
 const App = () => {
-
-  const classes = useStyles();
-  const RenderNavbar = authenticated === true ? <Navbar /> : <LoggedOutNavbar />
-
-  const renderHome = () => {
-    return (
-      <Home
-        history={history} 
-        authenticated={authenticated}
-      />
-    );
-  };
-
   return (
     <ThemeProvider theme={theme}>
-      <div className={classes.root}>
-        <Router history={history}>
-          { RenderNavbar }
-          <div>
-            <Switch>
-              <Route exact path="/:tab" component={renderHome} />
-              <Route exact path="/login" component={Login} />
-              <Route exact path="/signup" component={Signup} />
-              {/* <Route exact path="/editor/:slug" component={Editor} />
-              <Route exact path="/editor" component={Editor} />
-              <Route exact path="/article/:id" component={Article} />
-              <Route exact path="/settings" component={Settings} />
-              <Route exact path="/@:username/favorites" component={ProfileFavorites} />
-              <Route exact path="/@:username" component={Profile} /> */}
-            </Switch>
-          </div>
+      <Provider store={store}>
+        <Router history={history} >
+          <ScrollReset />
+          {renderRoutes(routes)}
         </Router>
-      </div>
+      </Provider>
     </ThemeProvider>
   );
 };
-
 
 
 export default App;
