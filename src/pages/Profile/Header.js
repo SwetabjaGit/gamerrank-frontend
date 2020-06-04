@@ -1,495 +1,248 @@
 import React, { useState, useEffect } from 'react';
-import { makeStyles } from '@material-ui/styles';
-import blueGrey from '@material-ui/core/colors/blueGrey';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import Tooltip from '@material-ui/core/Tooltip';
-import IconButton from '@material-ui/core/IconButton'; 
+import { Link as RouterLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
-
-// Icons
-import EditIcon from '@material-ui/icons/Edit';
-import Grid from '@material-ui/core/Grid';
-
-// Redux Stuff
-import { connect } from 'react-redux';
-import { 
-  handleFollow,
-  handleUnfollow,
-  handleFollowBack,
-  handleRevokeFollowBack,
-  clearFollower,
-  hideFollowAlert,
-  hideUnfollowAlert,
-  hideFollowbackAlert,
-  hideRevokefollowAlert
-} from '../../redux/actions/userActions';
-
+import clsx from 'clsx';
+import { makeStyles } from '@material-ui/styles';
+import {
+  Avatar,
+  Typography,
+  Button,
+  Hidden,
+  IconButton,
+  Snackbar,
+  Tooltip,
+  colors
+} from '@material-ui/core';
+import AddPhotoIcon from '@material-ui/icons/AddPhotoAlternate';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
+import ChatIcon from '@material-ui/icons/ChatOutlined';
+import MoreIcon from '@material-ui/icons/MoreVert';
 
 
 const useStyles = makeStyles(theme => ({
   root: {
-    boxShadow: 'none',
-    flexGrow: 1,
-    marginTop: 12,
-    backgroundColor: '#388E3C',
+    width: '100%',
+    margin: '0 auto'
   },
-  inner: {
-    margin: '0 auto',
-    width: theme.breakpoints.values.lg
-  },
-  profile: {
-    display: 'flex',
-    flexDirection: 'row',
-    width: 200,
-    height: 200,
+  cover: {
+    position: 'relative',
+    height: 360,
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'center',
+    '&:before': {
+      position: 'absolute',
+      content: '" "',
+      top: 0,
+      left: 0,
+      height: '100%',
+      width: '100%',
+      backgroundImage:
+        'linear-gradient(-180deg, rgba(0,0,0,0.00) 58%, rgba(0,0,0,0.32) 100%)'
+    },
     '&:hover': {
       '& $changeButton': {
         visibility: 'visible'
       }
-    },
-    margin: 'auto auto',
-    padding: theme.spacing(1),
-    '& .image-wrapper': {
-      textAlign: 'center',
-      position: 'absolute',
-      '& button': {
-        position: 'absolute',
-        top: '80%',
-        left: '70%'
-      }
-    },
-    '& .profile-image': {
-      width: 180,
-      height: 180,
-      objectFit: 'cover',
-      maxWidth: '100%',
-      borderRadius: '50%'
-    },
-    '& .profile-details': {
-      textAlign: 'center',
-      '& span, svg': {
-        verticalAlign: 'middle'
-      },
-      '& a': {
-        color: '#00bcd4'
-      }
-    },
-    '& hr': {
-      border: 'none',
-      margin: '0 0 10px 0'
-    },
-    '& svg.button': {
-      '&:hover': {
-        cursor: 'pointer'
-      }
     }
   },
-  infoBox: {
-    display: 'flex',
-    flexDirection: 'column',
-    paddingLeft: 50,
-  },
-  bannerText1: {
-    fontWeight: 'bold',
-    color: '#fff',
-    textAlign: 'left',
-    padding: 2,
-    
-  },
-  bannerText2: {
-    color: '#fff',
-    textAlign: 'left',
-    padding: 2,
-  },
-  dataBox: {
-    zoom: 2,
-    textAlign: 'center',
-    minHeight: '100%',
-    marginTop: 'auto',
-    marginBottom: 'auto',
-  },
-  dataText1: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  dataText2: {
-    color: '#fff',
-  },
   changeButton: {
+    visibility: 'hidden',
     position: 'absolute',
-    bottom: theme.spacing(10),
-    right: theme.spacing(10),
+    bottom: theme.spacing(3),
+    right: theme.spacing(3),
+    backgroundColor: colors.blueGrey[900],
     color: theme.palette.white,
+    [theme.breakpoints.down('md')]: {
+      top: theme.spacing(3),
+      bottom: 'auto'
+    },
     '&:hover': {
-      backgroundColor: blueGrey[900]
+      backgroundColor: colors.blueGrey[900]
     }
   },
   addPhotoIcon: {
     marginRight: theme.spacing(1)
   },
-  imagePicker: {
-    color: '#fff',
-  },
-  rowBox: {
+  container: {
+    width: theme.breakpoints.values.lg,
+    maxWidth: '100%',
+    padding: theme.spacing(2, 3),
+    margin: '0 auto',
+    position: 'relative',
     display: 'flex',
-    flexDirection: 'row'
+    flexWrap: 'wrap',
+    [theme.breakpoints.down('sm')]: {
+      flexDirection: 'column'
+    }
   },
-  columnBox: {
-    display: 'flex',
-    flexDirection: 'column'
+  avatar: {
+    border: `2px solid ${theme.palette.white}`,
+    height: 120,
+    width: 120,
+    top: -60,
+    left: theme.spacing(3),
+    position: 'absolute'
   },
-  buttonSolid: {
-    padding: 12,
-    width: '100%',
-    backgroundColor: '#ffc400',
-    marginLeft: 10,
-    marginRight: 10,
-    marginBottom: 10,
+  details: {
+    marginLeft: 136
   },
-  buttonOutlined: {
-    padding: 12,
-    width: '100%',
-    color: '#ffc400',
-    marginLeft: 10,
-    marginRight: 10,
-    marginBottom: 10,
+  actions: {
+    marginLeft: 'auto',
+    [theme.breakpoints.down('sm')]: {
+      marginTop: theme.spacing(1)
+    },
+    '& > * + *': {
+      marginLeft: theme.spacing(1)
+    }
+  },
+  pendingButton: {
+    color: theme.palette.white,
+    backgroundColor: colors.red[600],
+    '&:hover': {
+      backgroundColor: colors.red[900]
+    }
+  },
+  personAddIcon: {
+    marginRight: theme.spacing(1)
+  },
+  mailIcon: {
+    marginRight: theme.spacing(1)
   }
 }));
 
 
-const Header = (props) => {
-
-  const {
-    user, authenticated, authUser, followers, follower,
-    followAlert: { showFollowAlert, showUnfollowAlert, showFollowbackAlert, showRevokefollowAlert },
-    handleFollow, handleUnfollow, handleFollowBack,
-    handleRevokeFollowBack, clearFollower,
-    hideFollowAlert, hideUnfollowAlert, hideFollowbackAlert, hideRevokefollowAlert,
-    openFollowAlert, openUnfollowAlert, openFollowbackAlert, openRevokefollowAlert
-  } = props;
+const Header = props => {
+  const { className, ...rest } = props;
   const classes = useStyles();
-  
-  const [isFollower, setisFollower] = useState('');
-  const [isFollowed, setisFollowed] = useState('');
-  const [followedBack, setFollowedBack] = useState(false);
 
-
-  useEffect(() => {
-    window.onpopstate = () => {
-      hideFollowAlert();
-      hideUnfollowAlert();
-      hideFollowbackAlert();
-      hideRevokefollowAlert();
-    };
-  }, [hideFollowAlert, hideUnfollowAlert, hideFollowbackAlert, hideRevokefollowAlert]);
-  
-  useEffect(() => {
-    window.onpopstate = () => {
-      clearFollower();
-    }
-  }, [clearFollower]);
-
-  useEffect(() => {
-    if(authenticated){
-      setisFollower(followers[authUser + '_' + user.handle]);
-      setisFollowed(followers[user.handle + '_' + authUser]);
-    }
-  }, [authenticated, followers, authUser, user.handle]);
-
-  useEffect(() => {
-    if(authenticated && isFollowed){
-      setFollowedBack(followers[user.handle + '_' + authUser].followBack);
-    }
-  }, [authenticated, user.handle, authUser, followers, isFollowed]);
-
-  useEffect(() => {
-    if(showFollowAlert === true){
-      openFollowAlert();
-    }
-  }, [showFollowAlert, openFollowAlert]);
-
-  useEffect(() => {
-    if(showUnfollowAlert === true){
-      openUnfollowAlert();
-    }
-  }, [showUnfollowAlert, openUnfollowAlert]);
-
-  useEffect(() => {
-    if(showFollowbackAlert === true){
-      openFollowbackAlert();
-    }
-  }, [showFollowbackAlert, openFollowbackAlert]);
-
-  useEffect(() => {
-    if(showRevokefollowAlert === true){
-      openRevokefollowAlert();
-    }
-  }, [showRevokefollowAlert, openRevokefollowAlert]);
-
-  /* useEffect(() => {
-    console.log('followId', follower.followId);
-  }, [follower.followId]);
-
-  useEffect(() => {
-    console.log('followedId', follower.followedId);
-  }, [follower.followedId]); */
-
-  /* useEffect(() => {
-    console.log('followBack', followers[user.handle + '_' + authUser].followBack);
-    console.log('isFollowed', followers[user.handle + '_' + authUser]);
-  }, [followers, isFollowed, user.handle, authUser]); */
-  
-  
-
-  const handleImageChange = (event) => {
-    const image = event.target.files[0];
-    const formData = new FormData();
-    formData.append('image', image, image.name);
+  const user = {
+    name: 'Shen Zhi',
+    bio: 'Web Developer',
+    avatar: '/images/avatars/avatar_11.png',
+    cover: '/images/covers/cover_2.jpg',
+    connectedStatus: 'not_connected'
   };
 
-  const handleEditPicture = () => {
-    const fileInput = document.getElementById('imageInput');
-    fileInput.click();
-  };
+  const [connectedStatus, setConnectedStatus] = useState(user.connectedStatus); // if rejected do not show the button
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
-  const followUser = () => {
-    setisFollower(authUser + '_' + user.handle);
-    setisFollowed(null);
-    followers[authUser + '_' + user.handle] = {
-      follower: authUser,
-      following: user.handle,
-      followBack: false
+  useEffect(() => {
+    if (connectedStatus === 'pending') {
+      setOpenSnackbar(true);
     }
-    handleFollow(user.handle);
+  }, [connectedStatus]);
+
+  const handleConnectToggle = () => {
+    setConnectedStatus(connectedStatus =>
+      connectedStatus === 'not_connected' ? 'pending' : 'not_connected'
+    );
   };
 
-  const unfollowUser = () => {
-    setisFollower(null);
-    setisFollowed(null);
-    delete followers[authUser + '_' + user.handle];
-    handleUnfollow(follower.followId, user.handle);
+  const handleSnackbarClose = () => {
+    setOpenSnackbar(false);
   };
-
-  const followBackUser = () => {
-    setFollowedBack(true);
-    followers[user.handle + '_' + authUser].followBack = true;
-    handleFollowBack(follower.followedId, user.handle);
-  };
-
-  const revokeFollowBackUser = () => {
-    setFollowedBack(false);
-    followers[user.handle + '_' + authUser].followBack = false;
-    handleRevokeFollowBack(follower.followedId, user.handle);
-  };
-
-
-  const buttonFollow = (
-    <Button
-      variant="contained"
-      color="primary"
-      className={classes.buttonSolid}
-      onClick={followUser}
-    >
-      Follow
-    </Button>
-  );
-
-  const buttonUnfollow = (
-    <Button
-      variant="outlined"
-      color="primary" 
-      className={classes.buttonOutlined}
-      onClick={unfollowUser}
-    >
-      Unfollow
-    </Button>
-  );
-
-  const buttonFollowBack = (
-    <Button
-      variant="contained"
-      color="primary" 
-      className={classes.buttonSolid}
-      onClick={followBackUser}
-    >
-      Follow Back
-    </Button>
-  );
-
-  const buttonRevokeFollowBack = (
-    <Button
-      variant="outlined"
-      color="primary" 
-      className={classes.buttonOutlined}
-      onClick={revokeFollowBackUser}
-    >
-      Revoke FollowBack
-    </Button>
-  );
 
   return (
-    <div className={classes.root}>
-        <div className={classes.inner}>
-          <Grid container spacing={3}>
-            <Grid item xs={3} sm={3}>
-              <div className={classes.profile}>
-                <div className="image-wrapper">
-                  <input
-                    type="file" 
-                    id="imageInput"
-                    hidden="hidden"
-                    onChange={handleImageChange}
-                  />
-                  <img
-                    src={user.imageUrl}
-                    alt="profile"
-                    className="profile-image"
-                    onClick={handleEditPicture}
-                  />
-                  <Tooltip title="ChangeImage" placement="bottom" aria-label="add">
-                    <IconButton className={classes.button} color="inherit" onClick={handleEditPicture}>
-                      <EditIcon
-                        color="primary"
-                        className={classes.imagePicker}
-                      />
-                    </IconButton>
-                  </Tooltip>
-                </div>
-              </div>
-              <div className={classes.infoBox}>
-                <Typography
-                  className={classes.bannerText1}
-                  variant="h1"
-                >
-                  { user.handle }
-                </Typography>
-                <Typography
-                  className={classes.bannerText2}
-                  variant="h5"
-                >
-                  { user.bio }
-                </Typography>
-                <Typography
-                  className={classes.bannerText2}
-                  variant="h5"
-                >
-                  { user.location }
-                </Typography>
-                <Typography
-                  className={classes.bannerText2}
-                  variant="h5"
-                >
-                  { user.website }
-                </Typography>
-              </div>
-            </Grid>
-            <Grid item xs={3} sm={3} className={classes.dataBox}>
-              <Typography
-                className={classes.dataText1}
-                variant="h1"
-              >
-                { user.postCount }
-              </Typography>
-              <Typography
-                className={classes.dataText2}
-                variant="h5"
-              >
-                Posts
-              </Typography>
-            </Grid>
-            <Grid item xs={3} sm={3} className={classes.dataBox}>
-              <Typography
-                className={classes.dataText1}
-                variant="h1"
-              >
-                { user.followerCount }
-              </Typography>
-              <Typography
-                className={classes.dataText2}
-                variant="h5"
-              >
-                Followers
-              </Typography>
-            </Grid>
-            <Grid item xs={3} sm={3} className={classes.dataBox}>
-              <Typography
-                className={classes.dataText1}
-                variant="h1"
-              >
-                { user.followingCount }
-              </Typography>
-              <Typography
-                className={classes.dataText2}
-                variant="h5"
-              >
-                Following
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-              <div className={classes.rowBox}>
-                {
-                  authenticated && (
-                    (user.handle !== authUser) ? (!isFollower ? (
-                      isFollowed ? (
-                        followedBack === true ? buttonRevokeFollowBack : buttonFollowBack
-                      ) : buttonFollow
-                    ) : buttonUnfollow) : null
-                  )
-                }
-                <Button
-                  variant="outlined"
-                  color="default"
-                  className={classes.buttonOutlined}
-                >
-                  Message
-                </Button>
-                <Button 
-                  variant="outlined"
-                  color="default"
-                  className={classes.buttonOutlined}
-                >
-                  Email
-                </Button>
-              </div>
-            </Grid>
-          </Grid>
+    <div
+      {...rest}
+      className={clsx(classes.root, className)}
+    >
+      <div
+        className={classes.cover}
+        style={{ backgroundImage: `url(${user.cover})` }}
+      >
+        <Button
+          className={classes.changeButton}
+          variant="contained"
+        >
+          <AddPhotoIcon className={classes.addPhotoIcon} />
+          Change Cover
+        </Button>
+      </div>
+      <div className={classes.container}>
+        <Avatar
+          alt="Person"
+          className={classes.avatar}
+          src={user.avatar}
+        />
+        <div className={classes.details}>
+          <Typography
+            component="h2"
+            gutterBottom
+            variant="overline"
+          >
+            {user.bio}
+          </Typography>
+          <Typography
+            component="h1"
+            variant="h4"
+          >
+            {user.name}
+          </Typography>
         </div>
+        <Hidden smDown>
+          <div className={classes.actions}>
+            <Button
+              color="secondary"
+              component={RouterLink}
+              to="/chat"
+              variant="contained"
+            >
+              <ChatIcon className={classes.mailIcon} />
+              Send message
+            </Button>
+            {connectedStatus === 'not_connected' && (
+              <Button
+                color="primary"
+                onClick={handleConnectToggle}
+                variant="contained"
+              >
+                <PersonAddIcon className={classes.personAddIcon} />
+                Add connection
+              </Button>
+            )}
+            {connectedStatus === 'pending' && (
+              <Button
+                className={classes.pendingButton}
+                onClick={handleConnectToggle}
+                variant="contained"
+              >
+                <PersonAddIcon className={classes.personAddIcon} />
+                Pending connection
+              </Button>
+            )}
+            <Tooltip title="More options">
+              <IconButton>
+                <MoreIcon />
+              </IconButton>
+            </Tooltip>
+          </div>
+        </Hidden>
+      </div>
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left'
+        }}
+        autoHideDuration={6000}
+        message={
+          <Typography
+            color="inherit"
+            variant="h6"
+          >
+            Sent connection request
+          </Typography>
+        }
+        onClose={handleSnackbarClose}
+        open={openSnackbar}
+      />
     </div>
   );
 };
 
 Header.propTypes = {
-  className: PropTypes.string,
-  followers: PropTypes.object.isRequired,
-  follower: PropTypes.object,
-  followAlert: PropTypes.object.isRequired,
-  clearFollower: PropTypes.func.isRequired,
-  hideFollowAlert: PropTypes.func.isRequired,
-  hideUnfollowAlert: PropTypes.func.isRequired,
-  hideFollowbackAlert: PropTypes.func.isRequired,
-  hideRevokefollowAlert: PropTypes.func.isRequired
+  className: PropTypes.string
 };
 
-const mapStateToProps = (state) => ({
-  followers: state.user.followers,
-  follower: state.data.follower,
-  followAlert: state.user.followAlert
-});
-
-const mapActionsToProps = {
-  handleFollow,
-  handleUnfollow,
-  handleFollowBack,
-  handleRevokeFollowBack,
-  clearFollower,
-  hideFollowAlert,
-  hideUnfollowAlert,
-  hideFollowbackAlert,
-  hideRevokefollowAlert
-};
-
-export default connect(
-  mapStateToProps,
-  mapActionsToProps
-)(Header);
+export default Header;

@@ -11,7 +11,7 @@ import PostCard from './PostCard';
 
 // Redux Stuff
 import { connect } from 'react-redux';
-import { fetchOneArticle, clearArticle } from '../../redux/actions/dataActions';
+import { fetchOneArticle, clearArticle } from '../../redux/actions/screams';
 
 
 

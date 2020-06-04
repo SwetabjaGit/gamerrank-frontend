@@ -11,8 +11,7 @@ import withStyles from '@material-ui/core/styles/withStyles';
 const styles = (theme) => ({
   card: {
     display: 'flex',
-    margin: 10,
-    marginBottom: 15,
+    margin: theme.spacing(2, 0, 1, 0),
     minHeight: 210
   },
   cardContent: {

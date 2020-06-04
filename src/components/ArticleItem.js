@@ -29,7 +29,7 @@ const useStyles = makeStyles(theme => ({
   card: {
     position: 'relative',
     display: 'flex',
-    margin: theme.spacing(2),
+    margin: theme.spacing(2, 0, 1, 0),
     padding: theme.spacing(1)
   },
   media: {
@@ -112,7 +112,7 @@ const ArticleItem = props => {
         <CardHeader
           className={classes.cardHeader}
           avatar={
-            <Link to={`/profile/${scream.userHandle}/myarticles`} >
+            <Link to={`/profile/${scream.userHandle}/myarticles`}>
               <Avatar aria-label="recipe" className={classes.avatar} src={scream.userImage} />
             </Link>
           }

@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/styles';
 import { 
-  Tabs, 
-  Tab, 
-  Divider, 
+  Tabs,
+  Tab,
+  Divider,
   colors,
 } from '@material-ui/core';
 import { withRouter, Redirect } from 'react-router-dom';
@@ -11,7 +11,7 @@ import Grid from '@material-ui/core/Grid';
 import PropTypes from 'prop-types';
 
 // Components
-import Header from '../../components/Header';
+import Header from '../../components/Header'
 import GlobalFeed from './GlobalFeed';
 import YourFeed from './YourFeed';
 import TagFilter from './TagFilter';
@@ -19,22 +19,23 @@ import Tags from './Tags';
 
 //Redux Stuff
 import { connect } from 'react-redux';
-import { fetchArticles } from '../../redux/actions/dataActions';
-
 
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: '100%',
+    maxWidth: '100%',
     margin: '0 auto',
     backgroundColor: '#F4F6F8'
   },
   feed: {
+    width: '80%',
+    maxWidth: '100%',
     margin: '0 auto',
-    width: theme.breakpoints.values.lg
+    paddingLeft: 10
   },
   tabs: {
-    marginTop: theme.spacing(3)
+    width: '100%',
+    display: 'flex'
   },
   divider: {
     backgroundColor: colors.grey[300]
@@ -46,31 +47,22 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
     margin: theme.spacing(3)
   },
-  tagBox: {
-    marginTop: theme.spacing(5),
-    marginLeft: theme.spacing(2),
-    marginRight: theme.spacing(3),
-    padding: theme.spacing(2),
-    backgroundColor: '#F3F3F3',
-    display: 'flex',
-    justifyContent: 'center',
-    flexWrap: 'wrap',
-    '& > *': {
-      margin: theme.spacing(0.5),
-    },
+  tagSection: {
+    zIndex: 3,
+    position: 'relative'
+  },
+  tagsbox: {
+    position: 'fixed'
+  },
+  articleSection: {
   },
 }));
 
 const Home = (props) => {
 
-  const { match, history, authenticated, fetchArticles, articles } = props;
+  const { match, history, authenticated } = props;
   const classes = useStyles();
   const { tab } = match.params;
-
-
-  useEffect(() => {
-    (articles.length === 0) && fetchArticles();
-  }, [fetchArticles, articles]);
 
 
   const handleTabsChange = (event, value) => {
@@ -88,45 +80,53 @@ const Home = (props) => {
   }
 
   if(!tab){
-    return <Redirect to='/globalfeed' />;
+    return <Redirect to='/home/globalfeed' />;
   }
   if(!tabs.find(t => t.value === tab)) {
-    return <Redirect to="/" />;
+    return <Redirect to="/home" />;
   }
+
+  const PageHeader = (
+    <Header
+      title="CONDUIT"
+      description="A place to share your knowledge"
+    />
+  );
 
   return (
     <div className={classes.root}>
-      <Header
-        title="CONDUIT"
-        description="A place to share your knowledge"
-      />
+      {/* <PageHeader /> */}
       <Grid className={classes.feed} container spacing={1}>
-        <Grid item sm={9} xs={12}>
-          <Tabs
-            className={classes.tabs}
-            onChange={handleTabsChange}
-            scrollButtons="auto"
-            value={tab}
-            variant="scrollable"
-          >
-            {tabs.map(tab => (
-              <Tab
-                key={tab.value}
-                label={tab.label}
-                value={tab.value}
-              />
-            ))}
-          </Tabs>
-          <Divider className={classes.divider} />
-          <div className={classes.content}>
-            {/* {console.log(location.pathname)} */}
-            {tab === 'yourfeed' && <YourFeed />}
-            {tab === 'globalfeed' && <GlobalFeed />}
-            {tab === 'tagfilter' && <TagFilter />}
+        <Grid item md={8} sm={8} xs={12}>
+          <div className={classes.articleSection}>
+            <Tabs
+              className={classes.tabs}
+              onChange={handleTabsChange}
+              scrollButtons="auto"
+              value={tab}
+              variant="scrollable"
+            >
+              {tabs.map(tab => (
+                <Tab
+                  key={tab.value}
+                  label={tab.label}
+                  value={tab.value}
+                />
+              ))}
+            </Tabs>
+            <Divider className={classes.divider} />
+            <div className={classes.content}>
+              {/* {console.log(location.pathname)} */}
+              {tab === 'yourfeed' && <YourFeed />}
+              {tab === 'globalfeed' && <GlobalFeed />}
+              {tab === 'tagfilter' && <TagFilter />}
+            </div>
           </div>
         </Grid>
-        <Grid item sm={3} xs={12}>
-          <Tags />
+        <Grid item md={4} sm={4} xs={12}>
+          <div className={classes.tagSection}>
+            <Tags className={classes.tagsbox}/>
+          </div>
         </Grid>
       </Grid>
     </div>
@@ -134,21 +134,17 @@ const Home = (props) => {
 };
 
 Home.propTypes = {
-  fetchArticles: PropTypes.func.isRequired,
   match: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
   location: PropTypes.object.isRequired,
   authenticated: PropTypes.bool.isRequired,
-  articles: PropTypes.array.isRequired
 };
 
 const mapStateToProps = (state) => ({
   authenticated: state.user.authenticated,
-  articles: state.data.articles
 });
 
 const mapActionsToProps = {
-  fetchArticles
 };
 
 export default connect(

@@ -25,7 +25,7 @@ import ModalButton from "./AddArticleModal";
 
 //Redux Stuff
 import { connect } from 'react-redux';
-import { postArticle, uploadAndDisplay } from '../redux/actions/dataActions';
+import { postArticle } from '../redux/actions/screams';
 
 
 const useStyles = makeStyles(theme => ({
@@ -124,8 +124,6 @@ const AddArticle = (props) => {
     formData.set('body', value);
     formData.set('tagList', chips);
     formData.set('localImage', postImage);
-    console.log('Article Posted');
-    //props.uploadAndDisplay(formData);
     props.postArticle(formData);
     resetValuesAfterSubmit();
   };
@@ -240,15 +238,13 @@ const AddArticle = (props) => {
 AddArticle.propTypes = {
   className: PropTypes.string,
   postArticle: PropTypes.func.isRequired,
-  uploadAndDisplay: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
 });
 
 const mapActionsToProps = {
-  postArticle,
-  uploadAndDisplay
+  postArticle
 };
 
 export default connect(

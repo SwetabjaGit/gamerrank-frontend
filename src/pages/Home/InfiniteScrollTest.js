@@ -3,7 +3,7 @@ import InfiniteScroll from 'react-infinite-scroller';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import axios from 'axios';
 import { makeStyles } from '@material-ui/styles';
-//import './stylesheet.css';
+import { api } from '../SoundCloudTracks/util';
 
 
 const useStyles = makeStyles(() => ({
@@ -24,12 +24,7 @@ const InfiniteScrollTest = () => {
   const [tracks, setTracks] = useState([]);
   const [hasMoreItems, setHasMoreItems] = useState(true);
   const [nextHref, setNextHref] = useState(null);
-
-  const api = {
-    baseUrl: 'https://api.soundcloud.com',
-    user_id: '94957189',
-    client_id: 'caf73ef1e709f839664ab82bef40fa96'
-  };
+  
 
   const fetchMoreData = () => {
     var url = api.baseUrl + 

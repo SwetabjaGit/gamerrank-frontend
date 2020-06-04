@@ -20,7 +20,7 @@ import AuthTheme from '../utils/AuthTheme';
 
 // Redux Stuff
 import { connect } from 'react-redux';
-import { signupUser } from '../redux/actions/userActions';
+import { signupUser } from '../redux/actions/user';
 
 
 

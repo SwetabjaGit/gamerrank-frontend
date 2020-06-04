@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Card from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
 import Chip from '@material-ui/core/Chip';
 import { makeStyles } from '@material-ui/styles';
@@ -7,28 +8,38 @@ import PropTypes from 'prop-types';
 
 // Redux Stuff
 import { connect } from 'react-redux';
-import { fetchArticlesByTag } from '../../redux/actions/dataActions';
+import { fetchArticlesByTag } from '../../redux/actions/screams';
 
+import { tags as tagConstants } from '../../config/constants'
 
 
 const useStyles = makeStyles((theme) => ({
-  tagHeading: {
-    width: '100%',
-    margin: theme.spacing(3)
-  },
   tagBox: {
-    marginTop: theme.spacing(5),
+    marginTop: theme.spacing(9),
     marginLeft: theme.spacing(2),
-    marginRight: theme.spacing(3),
     padding: theme.spacing(2),
-    backgroundColor: '#DEDEDE',
     display: 'flex',
     justifyContent: 'center',
     flexWrap: 'wrap',
     '& > *': {
       margin: theme.spacing(0.5),
-    },
+    }
   },
+  tagHeading: {
+    width: '100%',
+    margin: theme.spacing(0.5, 3, 2, 1),
+  },
+  content: {
+    margin: 0
+  },
+  chip: {
+    backgroundColor: '#999999',
+    color: '#fff',
+    '&:hover': {
+      backgroundColor: '#555555',
+      color: '#fff'
+    }
+  }
 }));
 
 const Tags = (props) => {
@@ -38,13 +49,18 @@ const Tags = (props) => {
   const { fetchArticlesByTag } = props;
 
   const fetchTags = async (source) => {
-    await axios.get('/tags', { cancelToken: source.token })
-      .then(res => {
-        setTags(res.data.tags);
-      })
-      .catch(err => {
-        console.error(err);
-      });
+    if(process.env.NODE_ENV === 'development') {
+      console.log('MockTags');
+      setTags(tagConstants);
+    } else {
+      await axios.get('/tags', { cancelToken: source.token })
+        .then(res => {
+          setTags(res.data.tags);
+        })
+        .catch(err => {
+          console.error(err);
+        });
+    }
   };
 
   useEffect(() => {
@@ -70,23 +86,22 @@ const Tags = (props) => {
   const renderTags = tags ? (
     tags.map(tag => 
       <Chip
+        className={classes.chip}
         key={tag}
         label={tag} 
         component="a" 
         href={createTag(tag)} 
         clickable
         onClick={() => handleTagClick(tag)}
-        style={{
-          backgroundColor: '#687077',
-          color: '#fff'
-        }}
       />)
   ) : <p>Loading...</p>;
 
   return (
-    <div className={classes.tagBox}>
-      <Typography className={classes.tagHeading} variant="h5">Popular Tags</Typography>
-      {renderTags}
+    <div>
+      <Card className={classes.tagBox}>
+        <Typography className={classes.tagHeading} variant="h4">Popular Tags</Typography>
+        {renderTags}
+      </Card>
     </div>
   );
 };

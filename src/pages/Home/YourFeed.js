@@ -7,7 +7,7 @@ import ArticleItem from '../../components/ArticleItem';
 
 // Redux Stuff
 import { connect } from 'react-redux';
-import { fetchUsersFeed } from '../../redux/actions/userActions';
+import { fetchUsersFeed } from '../../redux/actions/user';
 
 
 const TagFilter = (props) => {
