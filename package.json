@@ -58,8 +58,7 @@
     "validate.js": "^0.12.0"
   },
   "scripts": {
-    "start": "NODE_ENV=development react-scripts start",
-    "prod:start" : "NODE_ENV=production react-scripts start",
+    "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
