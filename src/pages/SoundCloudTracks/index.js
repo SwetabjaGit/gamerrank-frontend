@@ -187,11 +187,8 @@ const Tracks = props => {
   };
 
   const fetchMoreData = () => {
-    var tracksUrl = api.baseUrl + 
-      '/users/' + api.user_id + '/favorites' +
-      '?client_id=' + api.client_id +
-      '&linked_partitioning=1&page_size=' + api.page_size;
-
+    const { base_url, user_id, client_id, page_size } = api;
+    var tracksUrl = `${base_url}/users/${user_id}/favorites?client_id=${client_id}&linked_partitioning=1&page_size=${page_size}`;
     if(nextHref) {
       tracksUrl = nextHref;
     }
@@ -296,10 +293,8 @@ const Tracks = props => {
             loadMore={fetchMoreData}
             hasMore={hasMoreItems}
             loader={loader}
-            key="aaaa"
           >
             <Grid
-              key="bbbb"
               container
               spacing={2}
             >
@@ -349,7 +344,7 @@ const Tracks = props => {
 
 Tracks.propTypes = {
   className: PropTypes.string,
-  loadingTracks: PropTypes.bool,
+  loadingtracks: PropTypes.bool,
   tracks: PropTypes.array.isRequired,
   nextHref: PropTypes.string,
   hasMoreItems: PropTypes.bool.isRequired,
@@ -358,7 +353,7 @@ Tracks.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  loadingTracks: state.tracks.loadingTracks,
+  loadingtracks: state.tracks.loadingTracks,
   tracks: state.tracks.tracks,
   nextHref: state.tracks.nextHref,
   hasMoreItems: state.tracks.hasMoreItems,

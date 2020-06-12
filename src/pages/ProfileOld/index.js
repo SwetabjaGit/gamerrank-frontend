@@ -5,18 +5,16 @@ import {
   Tab,
   Divider,
   colors,
-  Card
+  Grid,
 } from '@material-ui/core';
 import { withRouter, Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 // Components
-import Header from './Header';
+import Header from './HeaderOld';
 import HeaderSkeleton from '../../utils/HeaderSkeleton';
-import About from './About';
-import Myfeed from './Myfeed';
-import Likedposts from './Likedposts';
-import Connections from './Connections';
+import MyArticles from './MyArticles';
+import FavoritedArticles from './FavoritedArticles';
 import SnackbarAlert from '../../components/SnackbarAlert';
 
 // Redux Stuff
@@ -37,28 +35,25 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: 100,
     marginRight: 100
   },
-  card: {
-    width: '100%',
-    marginTop: theme.spacing(3),
-    marginBottom: theme.spacing(3),
-  },
   feed: {
-    width: '73%',
+    width: '70%',
     maxWidth: '100%',
     margin: '0 auto',
   },
-  tab: {
-    padding: theme.spacing(2, 3)
+  tabs: {
+    marginTop: theme.spacing(3)
   },
   divider: {
     backgroundColor: colors.grey[300]
   },
   content: {
+    marginTop: theme.spacing(3)
   },
 }));
 
+
 const Profile = (props) => {
-  
+
   const { 
     match, history, authenticated, authUser,
     profile, fetchProfile, clearProfile
@@ -86,9 +81,8 @@ const Profile = (props) => {
   };
 
   const tabs = [];
-  tabs.push({ value: 'myfeed', label: 'My Feed' });
-  tabs.push({ value: 'likedposts', label: 'Liked Posts' });
-  tabs.push({ value: 'connections', label: 'Connections' });
+  tabs.push({ value: 'myfeed', label: 'My Articles' });
+  tabs.push({ value: 'favorited', label: 'Favorited Articles' });
 
   if(!tab){
     return <Redirect to='/myfeed' />;
@@ -130,34 +124,32 @@ const Profile = (props) => {
   return (
     <div className={classes.root}>
       <div className={classes.feed}>
-        <Card className={classes.card}>
-          {displayHeader}
-        </Card>
-        {profile.user && <About userInfo={profile.user}/>}
-        <Card className={classes.card}>
-          <Tabs
-            className={classes.tabs}
-            onChange={handleTabsChange}
-            scrollButtons="auto"
-            value={tab}
-            variant="scrollable"
-          >
-            {tabs.map(tab => (
-              <Tab
-                className={classes.tab}
-                key={tab.value}
-                label={tab.label}
-                value={tab.value}
-              />
-            ))}
-          </Tabs>
-          <Divider className={classes.divider} />
-          <div className={classes.content}>
-            {tab === 'myfeed' && <Myfeed screams={profile.screams} /> }
-            {tab === 'likedposts' && <Likedposts screams={profile.screams} /> }
-            {tab === 'connections' && <Connections screams={profile.screams} /> }
-          </div>
-        </Card>  
+        { displayHeader }
+        <Grid container spacing={1}>
+          <Grid item md={12} sm={12} xs={12}>
+            <Tabs
+              className={classes.tabs}
+              onChange={handleTabsChange}
+              scrollButtons="auto"
+              value={tab}
+              variant="scrollable"
+            >
+              {tabs.map(tab => (
+                <Tab
+                  key={tab.value}
+                  label={tab.label}
+                  value={tab.value}
+                />
+              ))}
+            </Tabs>
+            <Divider className={classes.divider} />
+            <div className={classes.content}>
+              {/* {console.log(location.pathname)} */}
+              {tab === 'myfeed' && <MyArticles screams={profile.screams} /> }
+              {tab === 'favorited' && <FavoritedArticles screams={profile.screams} /> }
+            </div>
+          </Grid>
+        </Grid>
         <SnackbarAlert 
           open={openFAlert}
           onClose={handleFClose}
@@ -187,8 +179,8 @@ const Profile = (props) => {
   );
 };
 
+
 Profile.propTypes = {
-  authenticated: PropTypes.bool.isRequired,
   match: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
   location: PropTypes.object.isRequired,
@@ -216,3 +208,4 @@ export default connect(
   mapStateToProps,
   mapActionsToProps
 )(withRouter(Profile));
+

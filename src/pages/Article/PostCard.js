@@ -71,7 +71,7 @@ const PostCard = props => {
             className={classes.avatar}
             component={RouterLink}
             src={article.userImage}            
-            to={`/profile/${article.userHandle}/myarticles`}
+            to={`/profile/${article.userHandle}/myfeed`}
           />
         }
         disableTypography
@@ -85,7 +85,7 @@ const PostCard = props => {
         }
         title={
           <Link
-            to={`/profile/${article.userHandle}/myarticles`}
+            to={`/profile/${article.userHandle}/myfeed`}
             variant="h6"
           >
             <Typography variant="body2">

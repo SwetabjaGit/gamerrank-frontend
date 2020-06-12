@@ -5,7 +5,7 @@ import mock from '../mock';
 
 
 mock.onGet('/api/social-feed').reply(200, {
-  articles: [
+  collection: [
     {
       screamId: "QMIL4SgGpIGkKz0RNRhv",
       userHandle: 'Francisco Gibbs',

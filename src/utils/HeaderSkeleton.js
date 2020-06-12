@@ -3,16 +3,13 @@ import PropTypes from 'prop-types';
 
 import { makeStyles } from '@material-ui/styles';
 import { colors } from '@material-ui/core';
-//import Typography from '@material-ui/core/Typography';
-//import clsx from 'clsx';
-//import HeaderImage from '../images/beast-cover.jpg';
 
 
 const useStyles = makeStyles(theme => ({
   root: {
     boxShadow: 'none',
     backgroundColor: '#388E3C',
-    minHeight: 425,
+    minHeight: 300,
   },
   cover: {
     display: 'flex',

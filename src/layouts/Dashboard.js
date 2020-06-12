@@ -11,7 +11,7 @@ import Topbar from '../components/Topbar';
 import ChatBar from '../components/ChatBar';
 
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     height: '100%',
     width: '100%',
@@ -40,13 +40,23 @@ const useStyles = makeStyles(() => ({
     position: 'fixed',
   },
   content: {
+    /* [theme.breakpoints.up('lg')]: {
+      marginLeft: 0,
+    }, */
     marginLeft: 270,
     overflowY: 'auto',
     flex: '1 1 auto',
+    '@media (max-width: 1280px)' : {
+      marginLeft: 0,
+    }
   },
   chatbox: {
     minWidth: 270,
     width: 270,
+    '@media (max-width: 1400px)': {
+      minWidth: 0,
+      width: 0,
+    },
     zIndex: 1,
     backgroundColor: '#002b36',
     height: '100%',

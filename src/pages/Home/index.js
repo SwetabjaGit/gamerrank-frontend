@@ -29,6 +29,12 @@ const useStyles = makeStyles((theme) => ({
   },
   feed: {
     width: '80%',
+    '@media (max-width: 1280px)' : {
+      width: '90%',
+    },
+    '@media (max-width: 960px)' : {
+      width: '100%',
+    },
     maxWidth: '100%',
     margin: '0 auto',
     paddingLeft: 10
@@ -97,7 +103,7 @@ const Home = (props) => {
     <div className={classes.root}>
       {/* <PageHeader /> */}
       <Grid className={classes.feed} container spacing={1}>
-        <Grid item md={8} sm={8} xs={12}>
+        <Grid item md={8} sm={12} xs={12}>
           <div className={classes.articleSection}>
             <Tabs
               className={classes.tabs}
@@ -123,7 +129,7 @@ const Home = (props) => {
             </div>
           </div>
         </Grid>
-        <Grid item md={4} sm={4} xs={12}>
+        <Grid item md={4} sm={12} xs={12}>
           <div className={classes.tagSection}>
             <Tags className={classes.tagsbox}/>
           </div>

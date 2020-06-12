@@ -165,7 +165,7 @@ const Navbar = (props) => {
   const userProfile = (
     <Link
       key="userProfile"
-      to={`/profile/${currentUser}/myarticles`}
+      to={`/profile/${currentUser}/myfeed`}
     >
       <Button
         className={classes.logoutButton}

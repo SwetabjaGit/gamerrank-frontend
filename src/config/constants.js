@@ -1,5 +1,8 @@
 module.exports = {
-  SCREAMS_URL: 'https://asia-east2-socialape-d8699.cloudfunctions.net/api',
+  IS_MOCK_ENABLED: false,
+  API_BASE_DEV: 'http://localhost:5000/socialape-d8699/asia-east2/api',
+  API_BASE_PROD: 'https://asia-east2-socialape-d8699.cloudfunctions.net/api',
+  SCREAMS_URL: 'https://asia-east2-socialape-d8699.cloudfunctions.net/api/screams',
   SCREAMS_PAGE_SIZE: 4,
   SOUNDCLOUD_URL: 'https://api.soundcloud.com',
   SOUNDCLOUD_USER_ID: '94957189',

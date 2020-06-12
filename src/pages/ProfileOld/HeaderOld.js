@@ -162,7 +162,6 @@ const Header = (props) => {
     openFollowAlert, openUnfollowAlert, openFollowbackAlert, openRevokefollowAlert
   } = props;
   const classes = useStyles();
-  
   const [isFollower, setisFollower] = useState('');
   const [isFollowed, setisFollowed] = useState('');
   const [followedBack, setFollowedBack] = useState(false);

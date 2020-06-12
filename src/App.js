@@ -8,7 +8,10 @@ import axios from 'axios';
 
 // Utils
 import ScrollReset from './components/ScrollReset';
-import { SCREAMS_URL } from './config/constants';
+import {
+  API_BASE_DEV,
+  API_BASE_PROD
+} from './config/constants';
 import theme from './theme';
 import store from './redux/store';
 import routes from './routes';
@@ -16,6 +19,7 @@ import './utils/mock/accountMock';
 import './utils/mock/chatMock';
 import './utils/mock/articlesMock';
 import './utils/mock/socialFeedMock';
+import './utils/mock/userMock'
 import './css/App.scss';
 
 // Redux Stuff
@@ -25,7 +29,8 @@ import { logoutUser, getUserData } from './redux/actions/user';
 
 
 const history = createBrowserHistory();
-axios.defaults.baseURL = SCREAMS_URL;
+axios.defaults.baseURL 
+ = process.env.NODE_ENV === 'development' ? API_BASE_DEV : API_BASE_PROD;
 
 
 const token = localStorage.FBIdToken;

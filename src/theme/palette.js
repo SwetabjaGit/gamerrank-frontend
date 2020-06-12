@@ -2,6 +2,7 @@ import { colors } from '@material-ui/core';
 
 const white = '#FFFFFF';
 const black = '#000000';
+const danger = colors.red[600];
 const primary = '#16AC59';
 const secondary = '#E69C1C';
 const tertiary = '#794BC4';
@@ -13,6 +14,7 @@ const sixthColor = '#DC5520';
 export default {
   black,
   white,
+  danger,
   primary: {
     contrastText: white,
     dark: primary,
@@ -24,6 +26,12 @@ export default {
     dark: secondary,
     main: secondary,
     light: secondary
+  },
+  tertiary: {
+    contrastText: white,
+    dark: tertiary,
+    main: tertiary,
+    light: tertiary
   },
   error: {
     contrastText: white,
