@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import clsx from 'clsx';
 import { makeStyles } from '@material-ui/styles';
 import {
   Avatar,
@@ -30,14 +29,14 @@ const useStyles = makeStyles(theme => ({
   },
   cardHeader: {
     marginLeft: theme.spacing(2),
-    padding: theme.spacing(2.2)
+    padding: theme.spacing(2)
   },
   content: {
     paddingTop: 0,
     marginBottom: theme.spacing(-3),
   },
   listItem: {
-    padding: theme.spacing(1.5, 1),
+    padding: theme.spacing(1.1, 1),
   },
   divider: {
     margin: theme.spacing(0, 1),

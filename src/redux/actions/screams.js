@@ -17,12 +17,11 @@ import axios from 'axios';
 import localAxios from '../../utils/axios';
 
 
-export const fetchMockScreams = () => (dispatch) => {
+export const fetchMockArticles = () => (dispatch) => {
   dispatch({ type: LOADING_ARTICLES });
   localAxios.get('/api/social-feed')
     .then(res => {
       console.log('Mockdata: ', res.data);
-      if(res) {}
       dispatch(setArticles(res.data));
       dispatch(clearErrors());
       dispatch({ type: STOP_LOADING_ARTICLES });

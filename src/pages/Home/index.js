@@ -11,7 +11,6 @@ import Grid from '@material-ui/core/Grid';
 import PropTypes from 'prop-types';
 
 // Components
-import Header from '../../components/Header'
 import GlobalFeed from './GlobalFeed';
 import YourFeed from './YourFeed';
 import TagFilter from './TagFilter';
@@ -91,17 +90,10 @@ const Home = (props) => {
   if(!tabs.find(t => t.value === tab)) {
     return <Redirect to="/home" />;
   }
-
-  const PageHeader = (
-    <Header
-      title="CONDUIT"
-      description="A place to share your knowledge"
-    />
-  );
+  
 
   return (
     <div className={classes.root}>
-      {/* <PageHeader /> */}
       <Grid className={classes.feed} container spacing={1}>
         <Grid item md={8} sm={12} xs={12}>
           <div className={classes.articleSection}>
@@ -122,7 +114,6 @@ const Home = (props) => {
             </Tabs>
             <Divider className={classes.divider} />
             <div className={classes.content}>
-              {/* {console.log(location.pathname)} */}
               {tab === 'yourfeed' && <YourFeed />}
               {tab === 'globalfeed' && <GlobalFeed />}
               {tab === 'tagfilter' && <TagFilter />}

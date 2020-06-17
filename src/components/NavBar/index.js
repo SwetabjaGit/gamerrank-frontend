@@ -1,10 +1,11 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { Fragment, useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 //import { useSelector } from 'react-redux';
 import { makeStyles } from '@material-ui/styles';
-import { Drawer, Divider, Paper, Avatar, Typography } from '@material-ui/core';
+import { Drawer, Paper, Avatar } from '@material-ui/core';
 import { Hidden } from '@material-ui/core';
 
 import useRouter from '../../utils/useRouter';
@@ -18,32 +19,31 @@ const useStyles = makeStyles(theme => ({
     overflowY: 'auto',
   },
   content: {
-    padding: theme.spacing(2)
   },
   profile: {
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
-    minHeight: 'fit-content'
+    //alignItems: 'center',
+    minHeight: 'fit-content',
+    margin: theme.spacing(2, 0, 0, 3)
   },
   avatar: {
-    width: 60,
-    height: 60
+    width: 40,
+    height: 40
   },
   name: {
     marginTop: theme.spacing(1)
   },
   divider: {
-    marginTop: theme.spacing(2)
+    marginTop: theme.spacing(2),
   },
   navigation: {
-    marginTop: theme.spacing(2)
+    marginTop: theme.spacing(1),
   }
 }));
 
 const NavBar = props => {
   const { openMobile, onMobileClose, className, ...rest } = props;
-
   const classes = useStyles();
   const router = useRouter();
   //const session = useSelector(state => state.session);
@@ -61,18 +61,10 @@ const NavBar = props => {
           alt="Person"
           className={classes.avatar}
           component={RouterLink}
-          src="/images/avatars/avatar_4.png"
+          src="/images/logos/logo-hipster.png"
           to="/profile/1/timeline"
         />
-        <Typography
-          className={classes.name}
-          variant="h4"
-        >
-          Tyler Anderson
-        </Typography>
-        <Typography variant="body2">Software Developer</Typography>
       </div>
-      <Divider className={classes.divider} />
       <nav className={classes.navigation}>
         <Navigation
           component="div"

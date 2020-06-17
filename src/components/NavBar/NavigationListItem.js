@@ -4,7 +4,12 @@ import { NavLink as RouterLink } from 'react-router-dom';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/styles';
-import { ListItem, Button, Collapse, colors } from '@material-ui/core';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import Typography from '@material-ui/core/Typography';
+import Collapse from '@material-ui/core/Collapse';
+//import { colors } from '@material-ui/core/colors';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 
@@ -21,50 +26,61 @@ const CustomRouterLink = forwardRef((props, ref) => (
 
 const useStyles = makeStyles(theme => ({
   item: {
+    //border: '1px solid black',
     display: 'block',
-    paddingTop: 0,
-    paddingBottom: 0
+    height: '100%',
+    width: '100%',
+    padding: theme.spacing(1.6, 0),
+    textTransform: 'none',
+    letterSpacing: 0,
+    fontWeight: 'bold',
+    '&:hover': {
+      backgroundColor: "#fff",
+      color: "#000"
+    },
+    '&:hover $icon': {
+      color: "#000"
+    },
+    '&:hover $label': {
+      color: "#000"
+    },
   },
   itemLeaf: {
+    //border: '1px solid black',
     display: 'flex',
-    paddingTop: 0,
-    paddingBottom: 0
-  },
-  button: {
-    color: colors.blueGrey[800],
-    padding: '10px 8px',
-    justifyContent: 'flex-start',
-    textTransform: 'none',
-    letterSpacing: 0,
-    width: '100%'
-  },
-  buttonLeaf: {
-    color: colors.blueGrey[800],
-    padding: '10px 8px',
-    justifyContent: 'flex-start',
-    textTransform: 'none',
-    letterSpacing: 0,
     width: '100%',
-    fontWeight: theme.typography.fontWeightRegular,
-    '&.depth-0': {
-      fontWeight: theme.typography.fontWeightMedium
-    }
+    height: '100%',
+    padding: theme.spacing(1.6, 0),
+    justifyContent: 'flex-start',
+    textTransform: 'none',
+    letterSpacing: 0,
+    fontWeight: 'bold',
+    '&:hover': {
+      backgroundColor: "#adadad",
+      color: "#fff"
+    },
+    '&:hover $icon': {
+      color: "#fff"
+    },
+    '&:hover $label': {
+      color: "#fff"
+    },
   },
   icon: {
     color: theme.palette.icon,
     display: 'flex',
     alignItems: 'center',
-    marginRight: theme.spacing(1)
+    margin: theme.spacing(0, 2.5),
   },
   expandIcon: {
     marginLeft: 'auto',
-    height: 16,
-    width: 16
+    marginRight: theme.spacing(2),
   },
   label: {
-    display: 'flex',
     alignItems: 'center',
-    marginLeft: 'auto'
+    //marginLeft: 'auto',
+    fontWeight: 'bold',
+    fontSize: '1em'
   },
   active: {
     color: theme.palette.primary.main,
@@ -85,17 +101,19 @@ const NavigationListItem = props => {
     className,
     open: openProp,
     label: Label,
+    selectedIndex,
+    setSelectedIndex,
     ...rest
   } = props;
-
   const classes = useStyles();
   const [open, setOpen] = useState(openProp);
 
   const handleToggle = () => {
     setOpen(open => !open);
+    //setSelectedIndex(title);
   };
 
-  let paddingLeft = 8;
+  let paddingLeft = 0;
 
   if (depth > 0) {
     paddingLeft = 32 + 8 * depth;
@@ -111,26 +129,28 @@ const NavigationListItem = props => {
         {...rest}
         className={clsx(classes.item, className)}
         disableGutters
+        button
+        onClick={handleToggle}
+        style={style}
       >
-        <Button
-          className={classes.button}
-          onClick={handleToggle}
-          style={style}
-        >
-          {Icon && <Icon className={classes.icon} />}
-          {title}
-          {open ? (
+        <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <ListItemIcon>
+            {Icon && <Icon className={classes.icon} />}
+          </ListItemIcon>
+          <Typography className={classes.label}>
+            {title}
+          </Typography>
+          {open ? 
             <ExpandLessIcon
               className={classes.expandIcon}
               color="inherit"
-            />
-          ) : (
+            /> : 
             <ExpandMoreIcon
               className={classes.expandIcon}
               color="inherit"
             />
-          )}
-        </Button>
+          }
+        </div>
         <Collapse in={open}>{children}</Collapse>
       </ListItem>
     );
@@ -140,23 +160,25 @@ const NavigationListItem = props => {
         {...rest}
         className={clsx(classes.itemLeaf, className)}
         disableGutters
+        button
+        onClick={() => setSelectedIndex(title)}
+        selected={selectedIndex === title}
+        component={CustomRouterLink}
+        exact
+        to={href}
+        style={style}
       >
-        <Button
-          activeClassName={classes.active}
-          className={clsx(classes.buttonLeaf, `depth-${depth}`)}
-          component={CustomRouterLink}
-          exact
-          style={style}
-          to={href}
-        >
+        <ListItemIcon>
           {Icon && <Icon className={classes.icon} />}
+        </ListItemIcon>
+        <Typography className={classes.label}>
           {title}
-          {Label && (
-            <span className={classes.label}>
-              <Label />
-            </span>
-          )}
-        </Button>
+        </Typography>
+        {Label && (
+          <span className={classes.label}>
+            <Label />
+          </span>
+        )}
       </ListItem>
     );
   }

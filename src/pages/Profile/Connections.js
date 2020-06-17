@@ -1,27 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import _ from 'lodash';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { makeStyles } from '@material-ui/styles';
 import {
-  Avatar,
-  Button,
   Divider,
   Input,
   List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
   Snackbar,
   Typography,
   colors
 } from '@material-ui/core';
+
+// Icons
 import SearchIcon from '@material-ui/icons/Search';
-import CheckIcon from '@material-ui/icons/Check';
-import PersonAddIcon from '@material-ui/icons/PersonAdd';
-import axios from '../../utils/axios';
+
+// Components
+import Paginate from "../../components/Paginate";
+import { profile } from '../../config/constants';
+import Connection from './connection';
 
 
 const useStyles = makeStyles(theme => ({
@@ -37,23 +35,13 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center'
   },
   searchIcon: {
-    width: '100%',
     color: theme.palette.text.secondary
   },
   searchInput: {
+    width: '100%',
     marginLeft: theme.spacing(1),
     color: theme.palette.text.secondary,
     fontSize: '14px'
-  },
-  avatar: {
-    height: 50,
-    width: 50
-  },
-  listItem: {
-    flexWrap: 'wrap'
-  },
-  listItemText: {
-    marginLeft: theme.spacing(1)
   },
   connectButton: {
     marginLeft: 'auto'
@@ -74,55 +62,77 @@ const useStyles = makeStyles(theme => ({
       backgroundColor: colors.green[900]
     }
   },
-  buttonIcon: {
-    marginRight: theme.spacing(1)
+  paginateBox: {
+    width: '100%',
+    alignContent: 'center',
+    margin: 15
   }
 }));
 
-const Connections = props => {
-  const { className } = props;
 
+const Connections = props => {
+  const { connections, className } = props;
   const classes = useStyles();
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [connections, setConnections] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = profile.CONNECTIONS_PAGE_SIZE;
 
-  useEffect(() => {
+  /* useEffect(() => {
     let mounted = true;
-    const fetchConnections = () => {
-      axios.get('/api/users/1/connections').then(response => {
-        if (mounted) {
-          setConnections(response.data.connections);
-        }
-      });
-    };
     fetchConnections();
     return () => {
       mounted = false;
     };
-  }, []);
+  }, []); */
 
   const handleConnectToggle = id => {
-    setConnections(connections => {
-      const newConnections = _.map(connections, _.clone);
-      return newConnections.map(connection => {
-        if (connection.id === id) {
-          connection.status =
-            connection.status === 'connected' || connection.status === 'pending'
-              ? 'not_connected'
-              : 'pending';
+    const newConnections = _.map(connections, _.clone);
+    return newConnections.map(connection => {
+      if (connection.id === id) {
+        connection.status =
+          connection.status === 'connected' || connection.status === 'pending'
+            ? 'not_connected'
+            : 'pending';
 
-          if (connection.status === 'pending') {
-            setOpenSnackbar(true);
-          }
+        if (connection.status === 'pending') {
+          setOpenSnackbar(true);
         }
-        return connection;
-      });
+      }
+      return connection;
     });
   };
 
   const handleSnackbarClose = () => {
     setOpenSnackbar(false);
   };
+
+  const connectionsList = connections ? (
+    connections.map((connection, i) => (
+      <Connection
+        key={i}
+        index={i}
+        connection={connection}
+        length={connections.length}
+        handleConnectToggle={handleConnectToggle}
+      />
+    )) 
+  ) : [];
+
+  let pagesCount = connections
+    ? (connections.length > 0 
+        ? Math.ceil(connections.length / itemsPerPage) : 1
+    ) : 1;
+
+  const paginatedList = 
+    connectionsList.length > 0
+      ? connectionsList.slice(
+        currentPage * itemsPerPage,
+        (currentPage + 1) * itemsPerPage
+      ) : (
+        <Typography variant="h3">
+          You are not Connected to anyone
+        </Typography>
+      );
 
   return (
     <div className={clsx(classes.root, className)} >
@@ -133,7 +143,7 @@ const Connections = props => {
         />
         <Input
           className={classes.searchInput}
-          color="inherit"
+          color="primary"
           disableUnderline
           placeholder="Search people &amp; places"
         />
@@ -142,64 +152,17 @@ const Connections = props => {
       <div className={classes.content}>
         <PerfectScrollbar>
           <List disablePadding>
-            {connections.map((connection, i) => (
-              <ListItem
-                className={classes.listItem}
-                disableGutters
-                divider={i < connections.length - 1}
-                key={connection.id}
-              >
-                <ListItemAvatar>
-                  <Avatar
-                    alt="Profile image"
-                    className={classes.avatar}
-                    component={RouterLink}
-                    src={connection.avatar}
-                    to="/profile/1/timeline"
-                  />
-                </ListItemAvatar>
-                <ListItemText
-                  className={classes.listItemText}
-                  primary={connection.name}
-                  secondary={`${connection.common} connections in common`}
-                />
-                {connection.status === 'not_connected' && (
-                  <Button
-                    color="default"
-                    onClick={() => handleConnectToggle(connection.id)}
-                    size="small"
-                    variant="outlined"
-                  >
-                    <PersonAddIcon className={classes.buttonIcon} />
-                    Connect
-                  </Button>
-                )}
-                {connection.status === 'pending' && (
-                  <Button
-                    color="secondary"
-                    onClick={() => handleConnectToggle(connection.id)}
-                    size="small"
-                    variant="outlined"
-                  >
-                    <PersonAddIcon className={classes.buttonIcon} />
-                    Pending
-                  </Button>
-                )}
-                {connection.status === 'connected' && (
-                  <Button
-                    color="primary"
-                    onClick={() => handleConnectToggle(connection.id)}
-                    size="small"
-                    variant="outlined"
-                  >
-                    <CheckIcon className={classes.buttonIcon} />
-                    Connected
-                  </Button>
-                )}
-              </ListItem>
-            ))}
+            {paginatedList}
           </List>
         </PerfectScrollbar>
+      </div>
+      <div className={classes.paginateBox}>
+        <Paginate
+          itemsPerPage={itemsPerPage}
+          pagesCount={pagesCount}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+        />
       </div>
       <Snackbar
         anchorOrigin={{

@@ -18,7 +18,7 @@ import {
 // Redux Stuff
 import { connect } from 'react-redux';
 import {
-  fetchMockScreams,
+  fetchMockArticles,
   fetchArticles,
 } from '../../redux/actions/screams';
 
@@ -53,12 +53,11 @@ const useStyles = makeStyles((theme) => ({
 
 
 const GlobalFeed = (props) => {
-
   const {
     authenticated, UIloading, loading,
     articles, nextHref, hasMoreItems,
     currentUser, userImage,
-    fetchArticles, fetchMockScreams
+    fetchArticles, fetchMockArticles
   } = props;
   const classes = useStyles();
   let pageCount = 0;
@@ -83,7 +82,9 @@ const GlobalFeed = (props) => {
       screamsUrl = nextHref;
     }
     pageCount++;
-    IS_MOCK_ENABLED === true ? fetchMockScreams() : fetchArticles(screamsUrl);
+    IS_MOCK_ENABLED === true 
+      ? fetchMockArticles() 
+      : fetchArticles(screamsUrl);
   };
 
   const loader = (
@@ -138,7 +139,7 @@ GlobalFeed.propTypes = {
   hasMoreItems: PropTypes.bool.isRequired,
   currentUser: PropTypes.string,
   userImage: PropTypes.string,
-  fetchMockScreams: PropTypes.func.isRequired,
+  fetchMockArticles: PropTypes.func.isRequired,
   fetchArticles: PropTypes.func.isRequired,
 };
 
@@ -154,7 +155,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapActionsToProps = {
-  fetchMockScreams,
+  fetchMockArticles,
   fetchArticles
 };
 

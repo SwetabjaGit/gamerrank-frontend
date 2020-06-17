@@ -7,19 +7,16 @@ import {
   SET_UNAUTHENTICATED,
   LOADING_USER,
   FETCH_NOTIFICATIONS,
-  FIND_FOLLOWER,
-  FIND_FOLLOWED,
-  FOLLOW_USER,
-  UNFOLLOW_USER,
-  FOLLOW_BACK,
-  REVOKE_FOLLOW_BACK,
-  CLEAR_FOLLOWER,
   SET_USERS_FEED,
   LOADING_FEED,
   STOP_LOADING_FEED
 } from '../types';
 import axios from 'axios';
-import axios2 from '../../utils/axios';
+import localAxios from '../../utils/axios';
+import {
+  IS_MOCK_ENABLED,
+  DEBUG 
+} from '../../config/constants';
 
 
 
@@ -27,14 +24,16 @@ export const loginUser = (userData, history) => (dispatch) => {
   dispatch({ type: LOADING_UI });
   axios.post('/login', userData)
     .then((res) => {
-      console.log(res.data);
+      DEBUG && console.log(res.data);
       setAuthorizationHeader(res.data.token);
-      dispatch(getUserData());
+      IS_MOCK_ENABLED === true
+        ? dispatch(getMockUserData())
+        : dispatch(getUserData())
       history.push('/');
       dispatch(clearErrors());
     })
     .catch(err => {
-      console.error(err);
+      DEBUG && console.error(err);
       dispatch(setErrors(err));
     });
 };
@@ -44,14 +43,50 @@ export const signupUser = (newUserData, history) => (dispatch) => {
   dispatch({ type: LOADING_UI });
   axios.post('/signup', newUserData)
     .then((res) => {
-      console.log(res.data);  //Store the token in browser localstorage so that we can use it later
+      DEBUG && console.log(res.data);  //Store the token in browser localstorage so that we can use it later
       setAuthorizationHeader(res.data.token);
       dispatch(getUserData());
       history.push('/');
       dispatch(clearErrors());
     })
     .catch(err => {
-      console.error(err);
+      DEBUG && console.error(err);
+      dispatch(setErrors(err));
+    });
+};
+
+
+export const getUserData = () => (dispatch) => {
+  dispatch({ type: LOADING_USER });
+  axios.get('/user')
+    .then(res => {
+      DEBUG && console.log('UserData: ', res.data);
+      dispatch({
+        type: SET_USER,
+        payload: res.data
+      });
+      dispatch(clearErrors());
+    })
+    .catch(err => {
+      DEBUG && console.error(err);
+      dispatch(setErrors(err));
+    });
+};
+
+
+export const getMockUserData = () => (dispatch) => {
+  dispatch({ type: LOADING_USER });
+  localAxios.get('/api/auth/user')
+    .then(res => {
+      DEBUG && console.log('MockUser: ', res.data);
+      dispatch({
+        type: SET_USER,
+        payload: res.data
+      });
+      dispatch(clearErrors());
+    })
+    .catch(err => {
+      DEBUG && console.error(err);
       dispatch(setErrors(err));
     });
 };
@@ -70,7 +105,7 @@ export const fetchUsersFeed = () => (dispatch) => {
       dispatch({ type: STOP_LOADING_FEED });
     })
     .catch(err => {
-      console.error(err);
+      DEBUG && console.error(err);
       dispatch(setErrors(err));
       dispatch({ type: STOP_LOADING_FEED });
     })
@@ -78,7 +113,7 @@ export const fetchUsersFeed = () => (dispatch) => {
 
 
 export const fetchNotifications = () => (dispatch) => {
-  axios2.get('/api/account/notifications')
+  localAxios.get('/api/account/notifications')
     .then((res) => {
       dispatch({
         type: FETCH_NOTIFICATIONS,
@@ -87,7 +122,7 @@ export const fetchNotifications = () => (dispatch) => {
       dispatch(clearErrors());
     })
     .catch(err => {
-      console.error(err);
+      DEBUG && console.error(err);
       dispatch(setErrors(err));
     });
 };
@@ -101,23 +136,6 @@ export const logoutUser = () => (dispatch) => {
 };
 
 
-export const getUserData = () => (dispatch) => {
-  dispatch({ type: LOADING_USER });
-  axios.get('/user')
-    .then(res => {
-      dispatch({
-        type: SET_USER,
-        payload: res.data
-      });
-      dispatch(clearErrors());
-    })
-    .catch(err => {
-      console.error(err);
-      dispatch(setErrors(err));
-    });
-};
-
-
 export const uploadImage = (formData) => (dispatch) => {
   dispatch({ type: LOADING_USER });
   axios.post('/user/image', formData)
@@ -125,118 +143,8 @@ export const uploadImage = (formData) => (dispatch) => {
       dispatch(getUserData());
     })
     .catch(err => {
-      console.log(err);
+      DEBUG && console.log(err);
     });
-};
-
-
-export const findFollower = (userHandle) => (dispatch) => {
-  axios.get(`/findfollower/${userHandle}`)
-    .then((res) => {
-      dispatch({
-        type: FIND_FOLLOWER,
-        payload: res.data
-      });
-      dispatch(clearErrors());
-    })
-    .catch(err => {
-      console.error(err);
-      dispatch(setErrors(err));
-    });
-};
-
-
-export const findFollowed = (userHandle) => (dispatch) => {
-  axios.get(`/findfollowed/${userHandle}`)
-    .then((res) => {
-      dispatch({
-        type: FIND_FOLLOWED,
-        payload: res.data
-      });
-      dispatch(clearErrors());
-    })
-    .catch(err => {
-      console.error(err);
-      dispatch(setErrors(err));
-    });
-};
-
-
-export const handleFollow = (userHandle) => (dispatch) => {
-  console.log('HandleFollow Called');
-  axios.post(`/user/${userHandle}/follow`)
-    .then((res) => {
-      console.log(`${userHandle} followed`);
-      dispatch({
-        type: FOLLOW_USER,
-        payload: res.data
-      });
-      //dispatch({ type: SHOW_FOLLOW_ALERT });
-      dispatch(clearErrors());
-    })
-    .catch(err => {
-      console.error(err);
-      dispatch(setErrors(err));
-    });
-};
-
-
-export const handleUnfollow = (followId, userHandle) => (dispatch) => {
-  console.log('HandleUnfollow Called');
-  axios.delete(`/user/${followId}/unfollow`)
-    .then((res) => {
-      console.log(`${userHandle} unfollowed`);
-      dispatch({ 
-        type: UNFOLLOW_USER
-      });
-      //dispatch({ type: SHOW_UNFOLLOW_ALERT });
-      dispatch(clearErrors());
-    })
-    .catch(err => {
-      console.error(err);
-      dispatch(setErrors(err));
-    });
-};
-
-
-export const handleFollowBack = (followedId, userHandle) => (dispatch) => {
-  console.log('HandleFollowBack Called');
-  axios.post(`/user/${followedId}/followBack`)
-    .then((res) => {
-      console.log(`${userHandle} followed back`);
-      dispatch({ 
-        type: FOLLOW_BACK
-      });
-      //dispatch({ type: SHOW_FOLLOWBACK_ALERT });
-      dispatch(clearErrors());
-    })
-    .catch(err => {
-      console.error(err);
-      dispatch(setErrors(err));
-    });
-};
-
-
-export const handleRevokeFollowBack = (followedId, userHandle) => (dispatch) => {
-  console.log('RevokeFollowBack Called');
-  axios.post(`/user/${followedId}/revokeFollowBack`)
-    .then((res) => {
-      console.log(`${userHandle} Unfollowed`);
-      dispatch({ 
-        type: REVOKE_FOLLOW_BACK
-      });
-      //dispatch({ type: SHOW_REVOKEFOLLOW_ALERT });
-      dispatch(clearErrors());
-    })
-    .catch(err => {
-      console.error(err);
-      dispatch(setErrors(err));
-    });
-};
-
-
-export const clearFollower = () => (dispatch) => {
-  dispatch({ type: CLEAR_FOLLOWER });
 };
 
 
@@ -254,7 +162,7 @@ export const clearErrors = () => (dispatch) => {
 
 
 export const setErrors = (error) => (dispatch) => {
-  console.log(error);
+  DEBUG && console.log(error);
   dispatch({
     type: SET_ERRORS,
     payload: error

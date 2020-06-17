@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import { 
@@ -18,12 +19,14 @@ import Myfeed from './Myfeed';
 import Likedposts from './Likedposts';
 import Connections from './Connections';
 import SnackbarAlert from '../../components/SnackbarAlert';
+import { IS_MOCK_ENABLED } from '../../config/constants';
 
 // Redux Stuff
 import { connect } from 'react-redux';
 import {
   fetchProfile,
-  clearProfile
+  clearProfile,
+  fetchMockProfile
 } from '../../redux/actions/profile';
 
 
@@ -57,11 +60,16 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+
 const Profile = (props) => {
-  
   const { 
     match, history, authenticated, authUser,
-    profile, fetchProfile, clearProfile
+    profileUser,
+    profileScreams,
+    profileLikedScreams,
+    profileConnections,
+    profileConnection,
+    fetchProfile, clearProfile, fetchMockProfile
   } = props;
   const classes = useStyles();
   const { userHandle, tab } = match.params;
@@ -77,8 +85,10 @@ const Profile = (props) => {
 
 
   useEffect(() => {
-    fetchProfile(userHandle);
-  }, [userHandle, fetchProfile]);
+    userHandle && IS_MOCK_ENABLED === true
+      ? fetchMockProfile('/api/user/1/profile')
+      : fetchProfile(userHandle);
+  }, []);
 
 
   const handleTabsChange = (event, value) => {
@@ -113,9 +123,9 @@ const Profile = (props) => {
     setOpenUBAlert(false);
   };
 
-  const displayHeader = profile.user ? (
+  const displayHeader = profileUser ? (
     <Header 
-      user={profile.user}
+      user={profileUser}
       authenticated={authenticated}
       authUser={authUser}
       openFollowAlert={setOpenFAlert}
@@ -133,7 +143,7 @@ const Profile = (props) => {
         <Card className={classes.card}>
           {displayHeader}
         </Card>
-        {profile.user && <About userInfo={profile.user}/>}
+        {profileUser && <About userInfo={profileUser}/>}
         <Card className={classes.card}>
           <Tabs
             className={classes.tabs}
@@ -153,34 +163,34 @@ const Profile = (props) => {
           </Tabs>
           <Divider className={classes.divider} />
           <div className={classes.content}>
-            {tab === 'myfeed' && <Myfeed screams={profile.screams} /> }
-            {tab === 'likedposts' && <Likedposts screams={profile.screams} /> }
-            {tab === 'connections' && <Connections screams={profile.screams} /> }
+            {tab === 'myfeed' && <Myfeed screams={profileScreams} /> }
+            {tab === 'likedposts' && <Likedposts screams={profileLikedScreams} /> }
+            {tab === 'connections' && <Connections connections={profileConnections} /> }
           </div>
         </Card>  
         <SnackbarAlert 
           open={openFAlert}
           onClose={handleFClose}
           type="success"
-          message={profile.user && profile.user.handle + 'Followed Successfully'} 
+          message={profileUser && profileUser.handle + 'Followed Successfully'} 
         />  
         <SnackbarAlert 
           open={openUAlert} 
           onClose={handleUClose}
           type="success"
-          message={profile.user && profile.user.handle + 'Unfollowed Successfully'}
+          message={profileUser && profileUser.handle + 'Unfollowed Successfully'}
         />
         <SnackbarAlert 
           open={openFBAlert} 
           onClose={handleFBClose}
           type="success"
-          message={profile.user && profile.user.handle + 'Followed Back Successfully'}
+          message={profileUser && profileUser.handle + 'Followed Back Successfully'}
         />
         <SnackbarAlert 
           open={openUBAlert} 
           onClose={handleUBClose}
           type="success"
-          message={profile.user && profile.user.handle + 'Unfollowed Back Successfully'}
+          message={profileUser && profileUser.handle + 'Unfollowed Back Successfully'}
         />
       </div>
     </div>
@@ -197,17 +207,22 @@ Profile.propTypes = {
   authUser: PropTypes.string,
   fetchProfile: PropTypes.func.isRequired,
   clearProfile: PropTypes.func.isRequired,
-  
+  fetchMockProfile: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) => ({
   authenticated: state.user.authenticated,
-  profile: state.profile.profile,
+  profileUser: state.profile.user,
+  profileScreams: state.profile.screams,
+  profileLikedScreams: state.profile.likedScreams,
+  profileConnections: state.profile.connections,
+  profileConnection: state.profile.connection,
   loading: state.UI.loading,
   authUser: state.user.credentials.handle,
 });
 
 const mapActionsToProps = {
+  fetchMockProfile,
   fetchProfile,
   clearProfile,
 };

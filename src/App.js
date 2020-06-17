@@ -17,9 +17,9 @@ import store from './redux/store';
 import routes from './routes';
 import './utils/mock/accountMock';
 import './utils/mock/chatMock';
-import './utils/mock/articlesMock';
 import './utils/mock/socialFeedMock';
-import './utils/mock/userMock'
+import './utils/mock/userMock';
+import './utils/mock/profileMock';
 import './css/App.scss';
 
 // Redux Stuff

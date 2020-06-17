@@ -2,36 +2,50 @@ import { colors } from '@material-ui/core';
 
 const white = '#FFFFFF';
 const black = '#000000';
-const danger = colors.red[600];
-const primary = '#16AC59';
-const secondary = '#E69C1C';
-const tertiary = '#794BC4';
-const fourthColor = '#1991DA';
-const fifthColor = '#CA2056';
-const sixthColor = '#DC5520';
+const red = colors.red[600];
+const blue = '#2076e6'
+
+const twitterGreen = '#16AC59';
+const twitterYellow = '#E69C1C';
+const twitterViolet = '#794BC4';
+const twitterSkyblue = '#1991DA';
+const twitterPink = '#CA2056';
+const twitterOrange = '#DC5520';
+const twitterNavyblue = '#1e6bb8'
+
+const muiSuccess = '#4CAF50';
+const muiInfo = '#2196F3';
+const muiWarning = '#FB9701';
+const muiDanger = '#F44336';
 
 
 export default {
   black,
   white,
-  danger,
+  red,
+  blue,
+  twitterGreen,
+  twitterYellow,
+  twitterViolet,
+  twitterSkyblue,
+  twitterPink,
+  twitterOrange,
+  twitterNavyblue,
+  muiSuccess,
+  muiInfo,
+  muiWarning,
+  muiDanger,
   primary: {
     contrastText: white,
-    dark: primary,
-    main: primary,
-    light: primary
+    dark: twitterGreen,
+    main: twitterGreen,
+    light: twitterGreen
   },
   secondary: {
     contrastText: white,
-    dark: secondary,
-    main: secondary,
-    light: secondary
-  },
-  tertiary: {
-    contrastText: white,
-    dark: tertiary,
-    main: tertiary,
-    light: tertiary
+    dark: twitterYellow,
+    main: twitterYellow,
+    light: twitterYellow
   },
   error: {
     contrastText: white,

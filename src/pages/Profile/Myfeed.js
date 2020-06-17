@@ -1,30 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import ArticleItem from '../../components/ArticleItem';
-import Paginate from '../../components/Paginate';
-import { makeStyles } from '@material-ui/styles';
+import React, { useState, useEffect } from "react";
+import { makeStyles } from "@material-ui/styles";
+import axios from "axios";
 
 //Components
-import ScreamSkeleton from '../../utils/ScreamSkeleton';
+import ArticleItem from "../../components/ArticleItem";
+import Paginate from "../../components/Paginate";
+import ScreamSkeleton from "../../utils/ScreamSkeleton";
+import { profile } from "../../config/constants";
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    margin: theme.spacing(3)
+    margin: theme.spacing(3),
   },
   paginateBox: {
-    width: '100%',
-    alignContent: 'center',
-    margin: 15
-  }
+    width: "100%",
+    alignContent: "center",
+    margin: 15,
+  },
 }));
 
 const MyFeed = (props) => {
-  
   const { screams } = props;
   const classes = useStyles();
   const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 4;
-  
+  const itemsPerPage = profile.FEED_PAGE_SIZE;
 
   useEffect(() => {
     const CancelToken = axios.CancelToken;
@@ -36,15 +36,24 @@ const MyFeed = (props) => {
   }, []);
 
   const screamsList = screams ? (
-    screams.map(scream => <ArticleItem key={scream.screamId} scream={scream}></ArticleItem>)
+    screams.map((scream) => (
+      <ArticleItem key={scream.screamId} scream={scream} />
+    ))
   ) : (
     <ScreamSkeleton />
   );
 
-  let pagesCount = screamsList.length > 0 ? Math.ceil(screamsList.length / itemsPerPage) : 6;
+  let pagesCount =
+    screamsList.length > 0 
+    ? Math.ceil(screamsList.length / itemsPerPage) 
+    : 6;
 
-  const paginatedList = screamsList.length > 0 ? 
-    screamsList.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage) : screamsList;
+  const paginatedList =
+    screamsList.length > 0
+      ? screamsList.slice(
+          currentPage * itemsPerPage,
+          (currentPage + 1) * itemsPerPage
+      ) : screamsList;
 
   return (
     <div className={classes.root}>
@@ -60,7 +69,5 @@ const MyFeed = (props) => {
     </div>
   );
 };
-
-
 
 export default MyFeed;

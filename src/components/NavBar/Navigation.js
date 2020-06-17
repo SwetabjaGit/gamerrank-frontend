@@ -1,28 +1,28 @@
 /* eslint-disable react/no-multi-comp */
-import React from 'react';
+import React, { useState } from 'react';
 import { matchPath } from 'react-router-dom';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/styles';
-import { List, Typography } from '@material-ui/core';
-
+import { List } from '@material-ui/core';
 import useRouter from '../../utils/useRouter';
 import NavigationListItem from './NavigationListItem';
 
 
 const useStyles = makeStyles(theme => ({
   root: {
-    marginBottom: theme.spacing(3)
+    marginBottom: theme.spacing(3),
   }
 }));
 
 const NavigationList = props => {
   const { pages, ...rest } = props;
+  const [selectedIndex, setSelectedIndex] = useState('Settings');
 
   return (
     <List>
       {pages.reduce(
-        (items, page) => reduceChildRoutes({ items, page, ...rest }),
+        (items, page) => reduceChildRoutes({ items, page, selectedIndex, setSelectedIndex, ...rest }),
         []
       )}
     </List>
@@ -35,7 +35,7 @@ NavigationList.propTypes = {
 };
 
 const reduceChildRoutes = props => {
-  const { router, items, page, depth } = props;
+  const { router, items, page, depth, selectedIndex, setSelectedIndex } = props;
 
   if (page.children) {
     const open = matchPath(router.location.pathname, {
@@ -51,6 +51,8 @@ const reduceChildRoutes = props => {
         label={page.label}
         open={Boolean(open)}
         title={page.title}
+        selectedIndex={selectedIndex}
+        setSelectedIndex={setSelectedIndex}
       >
         <NavigationList
           depth={depth + 1}
@@ -68,6 +70,8 @@ const reduceChildRoutes = props => {
         key={page.title}
         label={page.label}
         title={page.title}
+        selectedIndex={selectedIndex}
+        setSelectedIndex={setSelectedIndex}
       />
     );
   }
@@ -77,7 +81,6 @@ const reduceChildRoutes = props => {
 
 const Navigation = props => {
   const { title, pages, className, component: Component, ...rest } = props;
-
   const classes = useStyles();
   const router = useRouter();
 
@@ -86,7 +89,7 @@ const Navigation = props => {
       {...rest}
       className={clsx(classes.root, className)}
     >
-      {title && <Typography variant="overline">{title}</Typography>}
+      {/* {title && <Typography variant="overline">{title}</Typography>} */}
       <NavigationList
         depth={0}
         pages={pages}

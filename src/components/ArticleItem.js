@@ -48,7 +48,7 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'column',
     flexGrow: 1,
-    marginLeft: 8,
+    marginLeft: theme.spacing(2),
     padding: 0
   },
   cardHeader: {
@@ -103,13 +103,6 @@ const ArticleItem = props => {
     setExpanded(!expanded);
   };
 
-  /* const handleArticleOpen = () => {
-    console.log('Article is Opening.');
-    return (
-      <Article key={scream.screamId} screamId={scream.screamId} />
-    );
-  }; */
-
   return (
     <Card className={classes.card}>
       <Link 
@@ -142,10 +135,10 @@ const ArticleItem = props => {
           subheader={dayjs(scream.createdAt).fromNow()}
         />
         <CardContent className={classes.cardText}>
-          <Typography variant="h5" style={{fontWeight: 'bold'}}>
+          <Typography variant="h5" style={{fontWeight: 'bold', marginBottom: 4}}>
             {scream.userHandle}
           </Typography>
-          <Typography variant="body2" color="textSecondary" component="p">
+          <Typography variant="body1" color="textSecondary" component="p">
             {scream.body}
           </Typography>
         </CardContent>
@@ -177,15 +170,20 @@ const ArticleItem = props => {
           <Typography
             color="textSecondary"
             variant="h6"
+            style={{ marginRight: 10 }}
           >
             {likes}
           </Typography>
-          <IconButton aria-label="add to favorites">
-            <CommentIcon />
-          </IconButton>
-          <IconButton aria-label="share">
-            <ShareIcon />
-          </IconButton>
+          <Tooltip title="Comment">
+            <IconButton aria-label="add to favorites">
+              <CommentIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Share">
+            <IconButton aria-label="share">
+              <ShareIcon />
+            </IconButton>
+          </Tooltip>
           <IconButton
             className={clsx(classes.expand, {
               [classes.expandOpen]: expanded,

@@ -1,4 +1,5 @@
 module.exports = {
+  DEBUG: true,
   IS_MOCK_ENABLED: false,
   API_BASE_DEV: 'http://localhost:5000/socialape-d8699/asia-east2/api',
   API_BASE_PROD: 'https://asia-east2-socialape-d8699.cloudfunctions.net/api',
@@ -8,6 +9,11 @@ module.exports = {
   SOUNDCLOUD_USER_ID: '94957189',
   SOUNDCLOUD_CLIENT_ID: 'caf73ef1e709f839664ab82bef40fa96',
   SOUNDCLOUD_PAGE_SIZE: 12,
+  profile: {
+    FEED_PAGE_SIZE: 4,
+    LIKED_POST_PAGE_SIZE: 3,
+    CONNECTIONS_PAGE_SIZE: 7
+  },
   tags: [
     "android",
     "animation",
