@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import Card from '@material-ui/core/Card';
@@ -10,9 +10,13 @@ import CardActions from '@material-ui/core/CardActions';
 import Collapse from '@material-ui/core/Collapse';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
+import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import { red } from '@material-ui/core/colors';
+
+// Icons
 import FavoriteIcon from '@material-ui/icons/Favorite';
+import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
 import CommentIcon from '@material-ui/icons/Comment';
 import ShareIcon from '@material-ui/icons/Share';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -44,7 +48,7 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'column',
     flexGrow: 1,
-    marginLeft: 8,
+    marginLeft: theme.spacing(2),
     padding: 0
   },
   cardHeader: {
@@ -70,28 +74,34 @@ const useStyles = makeStyles(theme => ({
   avatar: {
     backgroundColor: red[500],
     padding: 0,
-    maxWidth: 35,
-    maxHeight: 35
+    maxWidth: 40,
+    maxHeight: 40
   },
 }));
 
 const ArticleItem = props => {
-
   const { scream } = props;
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
+
+  const [liked, setLiked] = useState(scream.liked ? scream.liked : false);
+  const [likes, setLikes] = useState(scream.likeCount);
+
+  const handleLike = () => {
+    setLiked(true);
+    setLikes(likes => likes + 1);
+  };
+
+  const handleUnlike = () => {
+    setLiked(false);
+    setLikes(likes => likes - 1);
+  };
+
   dayjs.extend(relativeTime);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
-
-  /* const handleArticleOpen = () => {
-    console.log('Article is Opening.');
-    return (
-      <Article key={scream.screamId} screamId={scream.screamId} />
-    );
-  }; */
 
   return (
     <Card className={classes.card}>
@@ -103,7 +113,7 @@ const ArticleItem = props => {
         >
           <CardMedia
             className={classes.media}
-            image={scream.userImage}
+            image={scream.contentImage}
             title="Paella dish"
           />
         </CardActionArea>
@@ -112,7 +122,7 @@ const ArticleItem = props => {
         <CardHeader
           className={classes.cardHeader}
           avatar={
-            <Link to={`/profile/${scream.userHandle}/myarticles`}>
+            <Link to={`/profile/${scream.userHandle}/myfeed`}>
               <Avatar aria-label="recipe" className={classes.avatar} src={scream.userImage} />
             </Link>
           }
@@ -125,25 +135,55 @@ const ArticleItem = props => {
           subheader={dayjs(scream.createdAt).fromNow()}
         />
         <CardContent className={classes.cardText}>
-          <Typography variant="h5" style={{fontWeight: 'bold'}}>
+          <Typography variant="h5" style={{fontWeight: 'bold', marginBottom: 4}}>
             {scream.userHandle}
           </Typography>
-          <Typography variant="body2" color="textSecondary" component="p">
+          <Typography variant="body1" color="textSecondary" component="p">
             {scream.body}
           </Typography>
         </CardContent>
         <CardActions
          className={classes.cardActions}
-         disableSpacing>
-          <IconButton aria-label="add to favorites">
-            <FavoriteIcon />
-          </IconButton>
-          <IconButton aria-label="add to favorites">
-            <CommentIcon />
-          </IconButton>
-          <IconButton aria-label="share">
-            <ShareIcon />
-          </IconButton>
+         disableSpacing
+        >
+          {liked ? (
+            <Tooltip title="Unlike">
+              <IconButton
+                className={classes.likedButton}
+                onClick={handleUnlike}
+                size="small"
+              >
+                <FavoriteIcon />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <Tooltip title="Like">
+              <IconButton
+                className={classes.likeButton}
+                onClick={handleLike}
+                size="small"
+              >
+                <FavoriteBorderIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+          <Typography
+            color="textSecondary"
+            variant="h6"
+            style={{ marginRight: 10 }}
+          >
+            {likes}
+          </Typography>
+          <Tooltip title="Comment">
+            <IconButton aria-label="add to favorites">
+              <CommentIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Share">
+            <IconButton aria-label="share">
+              <ShareIcon />
+            </IconButton>
+          </Tooltip>
           <IconButton
             className={clsx(classes.expand, {
               [classes.expandOpen]: expanded,

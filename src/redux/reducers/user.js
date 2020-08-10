@@ -10,6 +10,7 @@ import {
   LOADING_FEED,
   STOP_LOADING_FEED
 } from '../types';
+import { DEBUG } from '../../config/constants'
 
 
 const initialState = {
@@ -50,10 +51,11 @@ export default (state = initialState, action) => {
       };
     case SET_USER:
       var result = action.payload.followers.reduce((map, obj) => {
-        let hashKey = obj.follower + '_' + obj.following;
+        let hashKey = `${obj.follower}_${obj.following}`;
         map[hashKey] = obj;
         return map;
       }, {});
+      DEBUG && console.log('FollowerMap: ', result);
       return {
         ...state,
         authenticated: true,

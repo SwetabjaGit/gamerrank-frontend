@@ -136,7 +136,6 @@ const Tracks = props => {
     tracks, nextHref, hasMoreItems,
     fetchTracks, clearTracks, ...rest
   } = props;
-
   const classes = useStyles();
   const sortRef = useRef(null);
   const searchRef = useRef(null);
@@ -145,6 +144,7 @@ const Tracks = props => {
   const [openSort, setOpenSort] = useState(false);
   const [selectedSort, setSelectedSort] = useState('Most popular');
   const [mode, setMode] = useState('grid');
+  let pageCount = 0;
 
 
   useEffect(() => {
@@ -187,26 +187,18 @@ const Tracks = props => {
   };
 
   const fetchMoreData = () => {
-    var tracksUrl = api.baseUrl + 
-      '/users/' + api.user_id + '/favorites' +
-      '?client_id=' + api.client_id +
-      '&linked_partitioning=1&page_size=' + api.page_size;
-
+    const { base_url, user_id, client_id, page_size } = api;
+    var tracksUrl = `${base_url}/users/${user_id}/favorites?client_id=${client_id}&linked_partitioning=1&page_size=${page_size}`;
     if(nextHref) {
       tracksUrl = nextHref;
     }
+    pageCount++;
     fetchTracks(tracksUrl);
   };
 
-  /* const pageHeader = (
-    <Header
-      title="CONDUIT"
-      description="A place to share your knowledge"
-    />
-  ); */
-
   const loader = (
-    <CircularProgress 
+    <CircularProgress
+      key={`progress_${pageCount}`}
       className={classes.progress} 
       color="secondary" 
       style={{ color: '#D41' }} 
@@ -296,24 +288,22 @@ const Tracks = props => {
             loadMore={fetchMoreData}
             hasMore={hasMoreItems}
             loader={loader}
-            key="aaaa"
           >
             <Grid
-              key="bbbb"
               container
               spacing={2}
             >
               {tracks.map((track, i) => (
                 <Grid
+                  key={`grid_${pageCount}_${i}`}
                   item
-                  key={track.id}
                   xl={mode === 'grid' ? 4 : 12}
                   lg={mode === 'grid' ? 4 : 12}
                   md={mode === 'grid' ? 6 : 12}
                   sm={12}
                   xs={12}
                 >
-                  <GridCard 
+                  <GridCard
                     key={track.id} 
                     track={track} 
                   />
@@ -349,7 +339,7 @@ const Tracks = props => {
 
 Tracks.propTypes = {
   className: PropTypes.string,
-  loadingTracks: PropTypes.bool,
+  //loadingtracks: PropTypes.bool,
   tracks: PropTypes.array.isRequired,
   nextHref: PropTypes.string,
   hasMoreItems: PropTypes.bool.isRequired,
@@ -358,7 +348,7 @@ Tracks.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  loadingTracks: state.tracks.loadingTracks,
+  //loadingtracks: state.tracks.loadingTracks,
   tracks: state.tracks.tracks,
   nextHref: state.tracks.nextHref,
   hasMoreItems: state.tracks.hasMoreItems,

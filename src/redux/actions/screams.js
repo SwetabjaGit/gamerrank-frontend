@@ -17,13 +17,12 @@ import axios from 'axios';
 import localAxios from '../../utils/axios';
 
 
-export const fetchMockScreams = () => (dispatch) => {
+export const fetchMockArticles = () => (dispatch) => {
   dispatch({ type: LOADING_ARTICLES });
-  dispatch({ type: LOADING_UI });
   localAxios.get('/api/social-feed')
     .then(res => {
-      console.log('Mockdata: ', res.data.articles);
-      dispatch(setArticles(res.data.articles));
+      console.log('Mockdata: ', res.data);
+      dispatch(setArticles(res.data));
       dispatch(clearErrors());
       dispatch({ type: STOP_LOADING_ARTICLES });
     })
@@ -37,7 +36,6 @@ export const fetchMockScreams = () => (dispatch) => {
 
 
 export const fetchArticles = (screamsUrl) => (dispatch) => {
-  dispatch({ type: LOADING_UI });
   dispatch({ type: LOADING_ARTICLES });
   axios.get(screamsUrl)
     .then(res => {

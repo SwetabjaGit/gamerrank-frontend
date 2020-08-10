@@ -8,10 +8,24 @@ import {
   FOLLOW_BACK,
   REVOKE_FOLLOW_BACK,
   CLEAR_FOLLOWER,
+  ADD_CONNECTION,
+  WITHDRAW_REQUEST,
+  ACCEPT_REQUEST,
+  DISCONNECT,
+  CLEAR_CONNECTION,
 } from '../types';
 
 const initialState = {
-  profile: {},
+  user: {},
+  screams: [],
+  likedScreams: [],
+  connections: [],
+  connection: {
+    sender: null,
+    receiver: null,
+    connected: false,
+    status: null,
+  },
   follower: {
     followId: null,
     followedId: null,
@@ -25,14 +39,14 @@ export default (state = initialState, action) => {
     case SET_PROFILE:
       return {
         ...state,
-        profile: action.payload,
-        follower: action.payload.follower
+        user: action.payload.user,
+        screams: action.payload.screams,
+        likedScreams: action.payload.likedScreams,
+        connections: action.payload.connections,
+        follower: action.payload.follower,
       };
     case CLEAR_PROFILE:
-      return {
-        ...state,
-        profile: {}
-      };
+      return initialState;
     case LOADING_PROFILE:
       return {
         ...state,
@@ -49,8 +63,8 @@ export default (state = initialState, action) => {
         follower: {
           ...state.follower,
           followId: action.payload.followId
-          }
-        };
+        }
+      };
     case UNFOLLOW_USER:
       return {
         ...state,
@@ -78,13 +92,47 @@ export default (state = initialState, action) => {
     case CLEAR_FOLLOWER:
       return {
         ...state,
-        follower: {
-          followId: null,
-          followedId: null,
-          followedBack: false
+        follower: initialState.follower
+      };
+
+    case ADD_CONNECTION:
+      return {
+        ...state,
+        connection: {
+          ...state.connection,
+          sender: action.payload.sender,
+          status: action.payload.status
         }
+      };
+    case WITHDRAW_REQUEST:
+      return {
+        ...state,
+        connection: {
+          ...state.connection,
+          sender: null,
+          status: action.payload.status
+        }
+      };
+    case ACCEPT_REQUEST:
+      return {
+        ...state,
+        connection: {
+          ...state.connection,
+          connected: true,
+          status: action.payload.status
+        }
+      };
+    case DISCONNECT:
+      return {
+        ...state,
+        connection: initialState.connection,
+      };
+    case CLEAR_CONNECTION:
+      return {
+        ...state,
+        connection: initialState.connection
       };
     default:
       return state;
   }
-}
+};

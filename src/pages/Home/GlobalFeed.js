@@ -9,16 +9,17 @@ import ScreamSkeleton from '../../utils/ScreamSkeleton';
 import AddArticle from '../../components/AddArticle';
 import ArticleCard from '../../components/ArticleCard';
 
-import { 
+import {
   SCREAMS_URL,
-  SCREAMS_PAGE_SIZE
+  SCREAMS_PAGE_SIZE,
+  IS_MOCK_ENABLED
 } from '../../config/constants';
 
 // Redux Stuff
 import { connect } from 'react-redux';
 import {
-  fetchMockScreams,
-  fetchArticles
+  fetchMockArticles,
+  fetchArticles,
 } from '../../redux/actions/screams';
 
 
@@ -52,18 +53,18 @@ const useStyles = makeStyles((theme) => ({
 
 
 const GlobalFeed = (props) => {
-
   const {
-    authenticated, loading,
+    authenticated, UIloading, loading,
     articles, nextHref, hasMoreItems,
     currentUser, userImage,
-    fetchArticles, fetchMockScreams
+    fetchArticles, fetchMockArticles
   } = props;
   const classes = useStyles();
+  let pageCount = 0;
 
 
   const articlesList = loading ? (
-    <ScreamSkeleton />
+    <ScreamSkeleton/>
   ) : (
     articles.map(scream => (
       <ArticleCard
@@ -74,22 +75,45 @@ const GlobalFeed = (props) => {
       />
     ))
   );
-
   
   const fetchMoreData = () => {
-    var screamsUrl = `${SCREAMS_URL}/screams?page_size=${SCREAMS_PAGE_SIZE}`;
+    var screamsUrl = `${SCREAMS_URL}?page_size=${SCREAMS_PAGE_SIZE}`;
     if(nextHref){
       screamsUrl = nextHref;
     }
-    fetchArticles(screamsUrl);
+    pageCount++;
+    IS_MOCK_ENABLED === true 
+      ? fetchMockArticles() 
+      : fetchArticles(screamsUrl);
   };
 
   const loader = (
-    <CircularProgress 
+    <CircularProgress
+      key={`progress_${pageCount}`}
       className={classes.progress} 
       color="secondary" 
       style={{ color: '#D41' }} 
     />
+  );
+
+  const renderArticles = UIloading ? (
+    <ScreamSkeleton />
+  ) : (
+    <InfiniteScroll
+      pageStart={0}
+      loadMore={fetchMoreData}
+      hasMore={hasMoreItems}
+      loader={articles.length === 0 ? <ScreamSkeleton key={`kk_${pageCount}`}/> : loader}
+    >
+      {articles.map((scream, i) => (
+        <ArticleCard
+          className={classes.post}
+          key={`scream_${pageCount}_${i}`}
+          scream={scream}
+          avatar={userImage}
+        />
+      ))}
+    </InfiniteScroll>
   );
 
   return (
@@ -101,39 +125,27 @@ const GlobalFeed = (props) => {
           userImage={userImage}
         />
       )}
-      <InfiniteScroll
-        pageStart={0}
-        loadMore={fetchMoreData}
-        hasMore={hasMoreItems}
-        loader={loader}
-      >
-        {articles.map(scream => (
-          <ArticleCard
-            className={classes.post}
-            key={scream.screamId}
-            scream={scream}
-            avatar={userImage}
-          />
-        ))}
-      </InfiniteScroll>
+      {renderArticles}
     </div>
   );
 };
 
 GlobalFeed.propTypes = {
   authenticated: PropTypes.bool.isRequired,
+  UIloading: PropTypes.bool.isRequired,
   loading: PropTypes.bool.isRequired,
   articles: PropTypes.array.isRequired,
   nextHref: PropTypes.string,
   hasMoreItems: PropTypes.bool.isRequired,
   currentUser: PropTypes.string,
   userImage: PropTypes.string,
-  fetchMockScreams: PropTypes.func.isRequired,
+  fetchMockArticles: PropTypes.func.isRequired,
   fetchArticles: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
   authenticated: state.user.authenticated,
+  UIloading: state.UI.loading,
   loading: state.data.loading,
   articles: state.data.articles,
   nextHref: state.data.nextHref,
@@ -143,7 +155,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapActionsToProps = {
-  fetchMockScreams,
+  fetchMockArticles,
   fetchArticles
 };
 

@@ -93,7 +93,7 @@ const ArticleCard = props => {
             className={classes.avatar}
             component={RouterLink}
             src={scream.userImage}
-            to={`/profile/${scream.userHandle}/myarticles`}
+            to={`/profile/${scream.userHandle}/myfeed`}
           />
         }
         disableTypography
@@ -107,7 +107,7 @@ const ArticleCard = props => {
         }
         title={
           <Link
-            to={`/profile/${scream.userHandle}/myarticles`}
+            to={`/profile/${scream.userHandle}/myfeed`}
             color="textPrimary"
             variant="h6"
             component={RouterLink}

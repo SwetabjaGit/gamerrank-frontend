@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import { 
@@ -6,27 +5,23 @@ import {
   Tab,
   Divider,
   colors,
-  Card
+  Grid,
 } from '@material-ui/core';
 import { withRouter, Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 // Components
-import Header from './Header';
+import Header from './HeaderOld';
 import HeaderSkeleton from '../../utils/HeaderSkeleton';
-import About from './About';
-import Myfeed from './Myfeed';
-import Likedposts from './Likedposts';
-import Connections from './Connections';
+import MyArticles from './MyArticles';
+import FavoritedArticles from './FavoritedArticles';
 import SnackbarAlert from '../../components/SnackbarAlert';
-import { IS_MOCK_ENABLED } from '../../config/constants';
 
 // Redux Stuff
 import { connect } from 'react-redux';
 import {
   fetchProfile,
-  clearProfile,
-  fetchMockProfile
+  clearProfile
 } from '../../redux/actions/profile';
 
 
@@ -40,36 +35,28 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: 100,
     marginRight: 100
   },
-  card: {
-    width: '100%',
-    marginTop: theme.spacing(3),
-    marginBottom: theme.spacing(3),
-  },
   feed: {
-    width: '73%',
+    width: '70%',
     maxWidth: '100%',
     margin: '0 auto',
   },
-  tab: {
-    padding: theme.spacing(2, 3)
+  tabs: {
+    marginTop: theme.spacing(3)
   },
   divider: {
     backgroundColor: colors.grey[300]
   },
   content: {
+    marginTop: theme.spacing(3)
   },
 }));
 
 
 const Profile = (props) => {
+
   const { 
     match, history, authenticated, authUser,
-    profileUser,
-    profileScreams,
-    profileLikedScreams,
-    profileConnections,
-    profileConnection,
-    fetchProfile, clearProfile, fetchMockProfile
+    profile, fetchProfile, clearProfile
   } = props;
   const classes = useStyles();
   const { userHandle, tab } = match.params;
@@ -85,10 +72,8 @@ const Profile = (props) => {
 
 
   useEffect(() => {
-    userHandle && IS_MOCK_ENABLED === true
-      ? fetchMockProfile('/api/user/1/profile')
-      : fetchProfile(userHandle);
-  }, []);
+    fetchProfile(userHandle);
+  }, [userHandle, fetchProfile]);
 
 
   const handleTabsChange = (event, value) => {
@@ -96,9 +81,8 @@ const Profile = (props) => {
   };
 
   const tabs = [];
-  tabs.push({ value: 'myfeed', label: 'My Feed' });
-  tabs.push({ value: 'likedposts', label: 'Liked Posts' });
-  tabs.push({ value: 'connections', label: 'Connections' });
+  tabs.push({ value: 'myfeed', label: 'My Articles' });
+  tabs.push({ value: 'favorited', label: 'Favorited Articles' });
 
   if(!tab){
     return <Redirect to='/myfeed' />;
@@ -123,9 +107,9 @@ const Profile = (props) => {
     setOpenUBAlert(false);
   };
 
-  const displayHeader = profileUser ? (
+  const displayHeader = profile.user ? (
     <Header 
-      user={profileUser}
+      user={profile.user}
       authenticated={authenticated}
       authUser={authUser}
       openFollowAlert={setOpenFAlert}
@@ -140,65 +124,63 @@ const Profile = (props) => {
   return (
     <div className={classes.root}>
       <div className={classes.feed}>
-        <Card className={classes.card}>
-          {displayHeader}
-        </Card>
-        {profileUser && <About userInfo={profileUser}/>}
-        <Card className={classes.card}>
-          <Tabs
-            className={classes.tabs}
-            onChange={handleTabsChange}
-            scrollButtons="auto"
-            value={tab}
-            variant="scrollable"
-          >
-            {tabs.map(tab => (
-              <Tab
-                className={classes.tab}
-                key={tab.value}
-                label={tab.label}
-                value={tab.value}
-              />
-            ))}
-          </Tabs>
-          <Divider className={classes.divider} />
-          <div className={classes.content}>
-            {tab === 'myfeed' && <Myfeed screams={profileScreams} /> }
-            {tab === 'likedposts' && <Likedposts screams={profileLikedScreams} /> }
-            {tab === 'connections' && <Connections connections={profileConnections} /> }
-          </div>
-        </Card>  
+        { displayHeader }
+        <Grid container spacing={1}>
+          <Grid item md={12} sm={12} xs={12}>
+            <Tabs
+              className={classes.tabs}
+              onChange={handleTabsChange}
+              scrollButtons="auto"
+              value={tab}
+              variant="scrollable"
+            >
+              {tabs.map(tab => (
+                <Tab
+                  key={tab.value}
+                  label={tab.label}
+                  value={tab.value}
+                />
+              ))}
+            </Tabs>
+            <Divider className={classes.divider} />
+            <div className={classes.content}>
+              {/* {console.log(location.pathname)} */}
+              {tab === 'myfeed' && <MyArticles screams={profile.screams} /> }
+              {tab === 'favorited' && <FavoritedArticles screams={profile.screams} /> }
+            </div>
+          </Grid>
+        </Grid>
         <SnackbarAlert 
           open={openFAlert}
           onClose={handleFClose}
           type="success"
-          message={profileUser && profileUser.handle + 'Followed Successfully'} 
+          message={profile.user && profile.user.handle + 'Followed Successfully'} 
         />  
         <SnackbarAlert 
           open={openUAlert} 
           onClose={handleUClose}
           type="success"
-          message={profileUser && profileUser.handle + 'Unfollowed Successfully'}
+          message={profile.user && profile.user.handle + 'Unfollowed Successfully'}
         />
         <SnackbarAlert 
           open={openFBAlert} 
           onClose={handleFBClose}
           type="success"
-          message={profileUser && profileUser.handle + 'Followed Back Successfully'}
+          message={profile.user && profile.user.handle + 'Followed Back Successfully'}
         />
         <SnackbarAlert 
           open={openUBAlert} 
           onClose={handleUBClose}
           type="success"
-          message={profileUser && profileUser.handle + 'Unfollowed Back Successfully'}
+          message={profile.user && profile.user.handle + 'Unfollowed Back Successfully'}
         />
       </div>
     </div>
   );
 };
 
+
 Profile.propTypes = {
-  authenticated: PropTypes.bool.isRequired,
   match: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
   location: PropTypes.object.isRequired,
@@ -207,22 +189,17 @@ Profile.propTypes = {
   authUser: PropTypes.string,
   fetchProfile: PropTypes.func.isRequired,
   clearProfile: PropTypes.func.isRequired,
-  fetchMockProfile: PropTypes.func.isRequired
+  
 };
 
 const mapStateToProps = (state) => ({
   authenticated: state.user.authenticated,
-  profileUser: state.profile.user,
-  profileScreams: state.profile.screams,
-  profileLikedScreams: state.profile.likedScreams,
-  profileConnections: state.profile.connections,
-  profileConnection: state.profile.connection,
+  profile: state.profile.profile,
   loading: state.UI.loading,
   authUser: state.user.credentials.handle,
 });
 
 const mapActionsToProps = {
-  fetchMockProfile,
   fetchProfile,
   clearProfile,
 };
@@ -231,3 +208,4 @@ export default connect(
   mapStateToProps,
   mapActionsToProps
 )(withRouter(Profile));
+

@@ -11,7 +11,6 @@ import Grid from '@material-ui/core/Grid';
 import PropTypes from 'prop-types';
 
 // Components
-import Header from '../../components/Header'
 import GlobalFeed from './GlobalFeed';
 import YourFeed from './YourFeed';
 import TagFilter from './TagFilter';
@@ -29,6 +28,12 @@ const useStyles = makeStyles((theme) => ({
   },
   feed: {
     width: '80%',
+    '@media (max-width: 1280px)' : {
+      width: '90%',
+    },
+    '@media (max-width: 960px)' : {
+      width: '100%',
+    },
     maxWidth: '100%',
     margin: '0 auto',
     paddingLeft: 10
@@ -85,19 +90,12 @@ const Home = (props) => {
   if(!tabs.find(t => t.value === tab)) {
     return <Redirect to="/home" />;
   }
-
-  const PageHeader = (
-    <Header
-      title="CONDUIT"
-      description="A place to share your knowledge"
-    />
-  );
+  
 
   return (
     <div className={classes.root}>
-      {/* <PageHeader /> */}
       <Grid className={classes.feed} container spacing={1}>
-        <Grid item md={8} sm={8} xs={12}>
+        <Grid item md={8} sm={12} xs={12}>
           <div className={classes.articleSection}>
             <Tabs
               className={classes.tabs}
@@ -116,14 +114,13 @@ const Home = (props) => {
             </Tabs>
             <Divider className={classes.divider} />
             <div className={classes.content}>
-              {/* {console.log(location.pathname)} */}
               {tab === 'yourfeed' && <YourFeed />}
               {tab === 'globalfeed' && <GlobalFeed />}
               {tab === 'tagfilter' && <TagFilter />}
             </div>
           </div>
         </Grid>
-        <Grid item md={4} sm={4} xs={12}>
+        <Grid item md={4} sm={12} xs={12}>
           <div className={classes.tagSection}>
             <Tags className={classes.tagsbox}/>
           </div>

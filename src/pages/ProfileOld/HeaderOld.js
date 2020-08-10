@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import blueGrey from '@material-ui/core/colors/blueGrey';
@@ -162,20 +163,18 @@ const Header = (props) => {
     openFollowAlert, openUnfollowAlert, openFollowbackAlert, openRevokefollowAlert
   } = props;
   const classes = useStyles();
-  
   const [isFollower, setisFollower] = useState('');
   const [isFollowed, setisFollowed] = useState('');
   const [followedBack, setFollowedBack] = useState(false);
 
 
-  /* useEffect(() => {
+  useEffect(() => {
     if(process.env.NODE_ENV === 'development') {
-      console.log('followId', follower.followId);
-      console.log('followedId', follower.followedId);
-      console.log('followBack', followers[user.handle + '_' + authUser].followBack);
-      console.log('isFollowed', followers[user.handle + '_' + authUser]);
+      follower && console.log('follower: ', follower);
+      user.handle && authUser &&
+        console.log('connection: ', followers[user.handle + '_' + authUser]);
     }
-  }, [follower.followId, follower.followedId, followers, isFollowed, user.handle, authUser]); */
+  }, [follower, followers, user.handle, authUser]);
 
   
   useEffect(() => {
@@ -420,6 +419,7 @@ const Header = (props) => {
     </div>
   );
 };
+
 
 Header.propTypes = {
   className: PropTypes.string,

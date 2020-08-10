@@ -26,9 +26,7 @@ const FavoritedArticles = (props) => {
   useEffect(() => {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
-
     //fetchScreams(source);
-
     return () => {
       source.cancel();
     };
